@@ -1,0 +1,56 @@
+[
+  {
+    "id": "interviewer-01",
+    "name": "陈总监",
+    "title": "业务面试官",
+    "gender": "male",
+    "style": "稳重正式",
+    "description": "中高层男性面试官，会议室木饰面背景，适合综合类和管理类模拟面试。",
+    "image": "/interviewers/interviewer-01-executive-male.png"
+  },
+  {
+    "id": "interviewer-02",
+    "name": "林经理",
+    "title": "综合面试官",
+    "gender": "female",
+    "style": "冷静专业",
+    "description": "女性综合面试官，现代玻璃会议室背景，适合日常面试训练。",
+    "image": "/interviewers/interviewer-02-modern-female.png"
+  },
+  {
+    "id": "interviewer-03",
+    "name": "周总",
+    "title": "高压面试官",
+    "gender": "male",
+    "style": "资深严谨",
+    "description": "资深男性面试官，高级会议室背景，适合偏正式或压力感训练。",
+    "image": "/interviewers/interviewer-03-senior-male.png"
+  },
+  {
+    "id": "interviewer-04",
+    "name": "许老师",
+    "title": "HR 面试官",
+    "gender": "female",
+    "style": "亲和观察",
+    "description": "女性 HR 面试官，浅色面试室背景，适合基础面试和行为面试。",
+    "image": "/interviewers/interviewer-04-hr-female.png"
+  },
+  {
+    "id": "interviewer-05",
+    "name": "顾主管",
+    "title": "技术面试官",
+    "gender": "male",
+    "style": "理性直接",
+    "description": "年轻男性技术面试官，现代科技公司会议室背景，适合技术岗训练。",
+    "image": "/interviewers/interviewer-05-tech-male.png"
+  },
+  {
+    "id": "interviewer-06",
+    "name": "沈经理",
+    "title": "产品面试官",
+    "gender": "female",
+    "style": "专注克制",
+    "description": "女性产品或技术负责人，高级会议室背景，适合产品、运营和项目类岗位训练。",
+    "image": "/interviewers/interviewer-06-product-female.png"
+  }
+]

@@ -1,0 +1,250 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 隐藏数字输入框自带的上下箭头 */
+@layer utilities {
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .no-spinner {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 210 20% 98%; /* #F0F4FA */
+    --foreground: 215 25% 15%; /* #1A2B42 */
+    --card: 210 20% 98%;
+    --card-foreground: 215 25% 15%;
+    --popover: 210 20% 98%;
+    --popover-foreground: 215 25% 15%;
+    --primary: 215 60% 45%; /* #2563EB - Blue Primary */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 93%; /* #E8EDF5 */
+    --secondary-foreground: 215 25% 15%;
+    --muted: 215 15% 55%; /* #7B8DA4 */
+    --muted-foreground: 215 10% 40%;
+    --accent: 210 25% 93%; /* Blue-tinted Accent */
+    --accent-foreground: 215 25% 15%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 210 15% 88%; /* #DBE2EC */
+    --input: 210 15% 88%;
+    --ring: 215 60% 45%;
+    --radius: 0.75rem;
+    --chart-1: 215 60% 50%;
+    --chart-2: 200 70% 45%;
+    --chart-3: 230 55% 55%;
+    --chart-4: 195 75% 45%;
+    --chart-5: 210 65% 60%;
+    --sidebar-background: 210 20% 97%;
+    --sidebar-foreground: 215 25% 25%;
+    --sidebar-primary: 215 60% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 25% 93%;
+    --sidebar-accent-foreground: 215 60% 45%;
+    --sidebar-border: 210 15% 88%;
+    --sidebar-ring: 215 60% 45%;
+  }
+  /* 通用滚动条样式 */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  /* hide vertical scrollbar */
+  /* ::-webkit-scrollbar-thumb:vertical {
+    background: transparent;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  *:hover::-webkit-scrollbar-thumb:vertical {
+    background: rgba(193, 193, 193, 0.5);
+  }
+
+  ::-webkit-scrollbar-thumb:vertical:hover {
+    background: rgba(193, 193, 193, 0.8);
+  } */
+
+  /* show horizontal scrollbar */
+  ::-webkit-scrollbar-thumb:horizontal {
+    background: rgba(193, 193, 193, 0.5);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:horizontal:hover {
+    background: rgba(193, 193, 193, 0.8);
+  }
+
+  .dark {
+    --background: 215 30% 10%; /* Deep Blue Charcoal */
+    --foreground: 210 20% 93%; /* Light Blue White */
+    --card: 215 28% 13%;
+    --card-foreground: 210 20% 93%;
+    --popover: 215 28% 13%;
+    --popover-foreground: 210 20% 93%;
+    --primary: 215 70% 55%; /* Brighter Blue for dark mode */
+    --primary-foreground: 215 30% 10%;
+    --secondary: 215 20% 18%;
+    --secondary-foreground: 210 20% 93%;
+    --muted: 215 10% 40%;
+    --muted-foreground: 215 10% 60%;
+    --accent: 215 20% 18%; /* Dark blue accent */
+    --accent-foreground: 210 20% 93%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 215 15% 20%;
+    --input: 215 15% 20%;
+    --ring: 215 70% 55%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 200 70% 55%;
+    --chart-3: 230 65% 55%;
+    --chart-4: 195 75% 50%;
+    --chart-5: 240 60% 60%;
+
+    --sidebar-background: 215 30% 8%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 215 70% 60%;
+    --sidebar-primary-foreground: 215 30% 10%;
+    --sidebar-accent: 215 20% 16%;
+    --sidebar-accent-foreground: 210 20% 85%;
+    --sidebar-border: 215 15% 18%;
+    --sidebar-ring: 215 70% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Alibaba PuHuiTi", "Microsoft YaHei", sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  body.workbench-body-lock {
+    overflow-y: hidden;
+  }
+
+  ::-moz-selection {
+    @apply text-primary-foreground bg-primary;
+  }
+
+  /* Fix Chrome extension screenshot problem, no impact on this project */
+  img,
+  svg {
+    @apply inline-block;
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+@keyframes tilt {
+  0%,
+  50%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(0.5deg);
+  }
+  75% {
+    transform: rotate(-0.5deg);
+  }
+}
+
+@keyframes gradient-xy {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animate-tilt {
+  animation: tilt 10s infinite linear;
+}
+
+.animate-gradient-xy {
+  animation: gradient-xy 15s ease infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.shadow-soft {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.shadow-glow-sm {
+  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(16px);
+}
+
+.bg-glow {
+  background-image: linear-gradient(135deg, rgba(37, 99, 235, 0.08), transparent 42%),
+    linear-gradient(315deg, rgba(16, 185, 129, 0.08), transparent 46%);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.22s ease-out both;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

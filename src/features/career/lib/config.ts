@@ -1,0 +1,118 @@
+/**
+ * Shared AI configuration for resume editing, mock interviews, and image analysis.
+ * The canonical values live in the Zustand store and are persisted in localStorage.
+ */
+import { useAIConfigStore } from "@/store/useAIConfigStore"
+
+export interface DeepSeekConfig {
+  apiKey: string
+  baseURL: string
+  model: string
+}
+
+export interface QwenConfig {
+  apiKey: string
+  baseURL: string
+  model: string
+}
+
+export interface SpeechConfig {
+  provider: "browser" | "dashscope"
+}
+
+export interface GlobalAPIConfig {
+  deepseek: DeepSeekConfig
+  qwen: QwenConfig
+  speech: SpeechConfig
+  mockAIEnabled: boolean
+}
+
+const DEFAULT_DEEPSEEK: DeepSeekConfig = {
+  apiKey: "",
+  baseURL: "https://api.deepseek.com/v1",
+  model: "deepseek-v4-flash",
+}
+
+const DEFAULT_QWEN: QwenConfig = {
+  apiKey: "",
+  baseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  model: "qwen3.6-plus",
+}
+
+const DEFAULT_SPEECH: SpeechConfig = {
+  provider: "browser",
+}
+
+export function getDefaultConfig(): GlobalAPIConfig {
+  return {
+    deepseek: { ...DEFAULT_DEEPSEEK },
+    qwen: { ...DEFAULT_QWEN },
+    speech: { ...DEFAULT_SPEECH },
+    mockAIEnabled: false,
+  }
+}
+
+export function loadConfig(): GlobalAPIConfig {
+  const state = useAIConfigStore.getState()
+  return {
+    deepseek: {
+      ...DEFAULT_DEEPSEEK,
+      apiKey: state.deepseekApiKey,
+      model: state.deepseekModelId,
+    },
+    qwen: {
+      ...DEFAULT_QWEN,
+      apiKey: state.qwenApiKey,
+      baseURL: state.qwenApiEndpoint,
+      model: state.qwenModelId,
+    },
+    speech: {
+      provider: state.speechProvider,
+    },
+    mockAIEnabled: state.mockAIEnabled,
+  }
+}
+
+export function saveConfig(config: GlobalAPIConfig): void {
+  const state = useAIConfigStore.getState()
+  state.setDeepseekApiKey(config.deepseek.apiKey)
+  state.setDeepseekModelId(config.deepseek.model)
+  state.setQwenApiKey(config.qwen.apiKey)
+  state.setQwenModelId(config.qwen.model)
+  state.setSpeechProvider(config.speech.provider)
+  state.setMockAIEnabled(config.mockAIEnabled)
+}
+
+export function resetConfig(): GlobalAPIConfig {
+  const defaults = getDefaultConfig()
+  saveConfig(defaults)
+  return defaults
+}
+
+export function getDeepSeekConfig(): DeepSeekConfig {
+  return loadConfig().deepseek
+}
+
+export function getSpeechConfig(): SpeechConfig {
+  return loadConfig().speech
+}
+
+export function isMockAIEnabled(): boolean {
+  return useAIConfigStore.getState().mockAIEnabled
+}
+
+export function isDeepSeekConfigured(): boolean {
+  if (isMockAIEnabled()) return true
+  const cfg = loadConfig().deepseek
+  return !!cfg.apiKey && !!cfg.baseURL && !!cfg.model
+}
+
+export function getQwenConfig(): QwenConfig {
+  return loadConfig().qwen
+}
+
+export function isQwenConfigured(): boolean {
+  if (isMockAIEnabled()) return true
+  const cfg = loadConfig().qwen
+  return !!cfg.apiKey && !!cfg.baseURL && !!cfg.model
+}

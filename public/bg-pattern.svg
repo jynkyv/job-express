@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1024" viewBox="0 0 1440 1024">
+  <defs>
+    <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EFF6FF;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#F8FAFC;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#DBEAFE;stop-opacity:0.3"/>
+      <stop offset="100%" style="stop-color:#BFDBFE;stop-opacity:0.1"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:0.06"/>
+      <stop offset="100%" style="stop-color:#2563EB;stop-opacity:0.02"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 底色 -->
+  <rect width="1440" height="1024" fill="url(#g1)"/>
+
+  <!-- 右上大圆 -->
+  <circle cx="1200" cy="100" r="320" fill="url(#g2)"/>
+  <!-- 左下大圆 -->
+  <circle cx="100" cy="850" r="280" fill="url(#g2)"/>
+  <!-- 中间偏右椭圆 -->
+  <ellipse cx="1050" cy="700" rx="350" ry="180" fill="url(#accent)"/>
+
+  <!-- 装饰小点阵 -->
+  <circle cx="320" cy="160" r="4" fill="#93C5FD" opacity="0.25"/>
+  <circle cx="340" cy="160" r="4" fill="#93C5FD" opacity="0.25"/>
+  <circle cx="360" cy="160" r="4" fill="#93C5FD" opacity="0.25"/>
+  <circle cx="380" cy="160" r="4" fill="#93C5FD" opacity="0.25"/>
+
+  <circle cx="1150" cy="880" r="3" fill="#93C5FD" opacity="0.2"/>
+  <circle cx="1170" cy="880" r="3" fill="#93C5FD" opacity="0.2"/>
+  <circle cx="1190" cy="880" r="3" fill="#93C5FD" opacity="0.2"/>
+
+  <!-- 装饰细线 -->
+  <line x1="0" y1="0" x2="400" y2="400" stroke="#BFDBFE" stroke-width="0.5" opacity="0.15"/>
+  <line x1="1440" y1="1024" x2="1000" y2="600" stroke="#BFDBFE" stroke-width="0.5" opacity="0.15"/>z
+</svg>
