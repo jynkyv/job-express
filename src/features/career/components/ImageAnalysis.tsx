@@ -190,8 +190,8 @@ export default function ImageAnalysis({ onResultChange }: Props) {
 
   const positionLabel = POSITIONS.find((p) => p.value === position)?.label || "通用岗位"
   const isLoading = phase === "analyzing" || phase === "parsing" || phase === "validating"
-  const hasPhoto = processedPhotos.length > 0
-  const canAnalyze = hasPhoto && !isLoading
+  const analysisPhotos = processedPhotos.length > 0 ? processedPhotos : photos
+  const canAnalyze = !isLoading
 
   useEffect(() => {
     if (analysisError) setError(analysisError)
@@ -239,13 +239,16 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   }, [processedPhotos, phase, validatePhoto, clearValidation])
 
   const doAnalyze = useCallback(async () => {
-    if (processedPhotos.length === 0) return
+    if (!analysisPhotos[0]) {
+      setError("请先上传照片")
+      return
+    }
     setError("")
     onResultChange(null)
     setActiveTab("outfit")
 
-    await analyze(bmi, age, gender, position, processedPhotos)
-  }, [bmi, processedPhotos, age, gender, position, analyze, onResultChange])
+    await analyze(bmi, age, gender, position, analysisPhotos)
+  }, [bmi, analysisPhotos, age, gender, position, analyze, onResultChange])
 
   const handleReset = useCallback(() => {
     clearPhotos()
