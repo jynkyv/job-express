@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect, useCallback } from "react"
+import { useState, useMemo, useEffect, useCallback, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { POSITIONS } from "@/features/career/lib/prompts"
@@ -168,6 +168,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   const [error, setError] = useState("")
   const [activeTab, setActiveTab] = useState<AnalysisTab>("outfit")
   const [showPrivacy, setShowPrivacy] = useState(false)
+  const reportRef = useRef<HTMLElement | null>(null)
 
   const {
     photos, processedPhotos, isDragging, fileInputRef, dropRef,
@@ -231,6 +232,14 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   }, [phase, safeAnalysisResult, onResultChange, bmi])
 
   useEffect(() => {
+    if (phase === "complete" && safeAnalysisResult) {
+      window.requestAnimationFrame(() => {
+        reportRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+      })
+    }
+  }, [phase, safeAnalysisResult])
+
+  useEffect(() => {
     if (processedPhotos.length > 0 && phase === "idle") {
       validatePhoto(processedPhotos[0])
     } else if (processedPhotos.length === 0) {
@@ -259,7 +268,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   }, [clearPhotos, clearValidation, resetAnalysis, onResultChange])
 
   return (
-    <div className="h-full overflow-hidden bg-[#eef4fb] px-6 pb-6 pt-20">
+    <div className="h-full overflow-y-auto bg-[#eef4fb] px-6 pb-6 pt-20">
       <div className="grid h-[calc(100vh-6.5rem)] min-h-0 grid-cols-[minmax(0,1fr)_390px] gap-5 max-xl:grid-cols-1">
         <main className="flex h-full min-h-0 flex-col rounded-[34px] border border-slate-200 bg-white/95 p-7 shadow-[0_22px_70px_rgba(15,23,42,0.075)]">
           <section className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_430px] gap-6 max-2xl:grid-cols-[minmax(0,1fr)_400px] max-lg:grid-cols-1">
@@ -471,6 +480,14 @@ export default function ImageAnalysis({ onResultChange }: Props) {
               {isLoading ? <Loader2 className="size-5 animate-spin" /> : <Sparkles className="size-5" />}
               {isLoading ? "正在分析" : safeAnalysisResult ? "重新分析" : "开始 AI 形象分析"}
             </button>
+            {safeAnalysisResult && !isLoading && (
+              <button
+                onClick={() => reportRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-blue-100 bg-blue-50 px-4 text-sm font-black text-blue-700 transition hover:bg-blue-100"
+              >
+                查看分析结果
+              </button>
+            )}
           </div>
         </aside>
       </div>
@@ -493,7 +510,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
       )}
 
       {safeAnalysisResult && !isLoading && (
-        <section className="mt-5 space-y-4 rounded-[34px] border border-slate-200 bg-white/95 p-6 shadow-sm">
+        <section ref={reportRef} className="mt-5 scroll-mt-20 space-y-4 rounded-[34px] border border-slate-200 bg-white/95 p-6 shadow-sm">
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-sm font-bold text-blue-600">形象报告</p>
