@@ -350,61 +350,59 @@ export default function ImageAnalysis({ onResultChange }: Props) {
             <div
               ref={dropRef}
               onClick={() => fileInputRef.current?.click()}
-              className={`group relative min-h-0 cursor-pointer overflow-hidden rounded-[28px] border border-blue-100 bg-white p-4 shadow-sm transition-all ${
+              className={`group relative flex min-h-0 cursor-pointer flex-col overflow-hidden rounded-[28px] border border-blue-100 bg-white shadow-sm transition-all ${
                 isDragging ? "scale-[1.01] border-blue-300 ring-4 ring-blue-100" : "hover:border-blue-200 hover:shadow-md"
               }`}
             >
-              <div className="relative z-10 flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white">
-                <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
-                  <span className="text-slate-900">照片预览与拍摄要点</span>
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">正面 / 上半身 / 光线均匀</span>
-                </div>
-                <div className="relative mx-4 mt-4 flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
-                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_32%,rgba(37,99,235,0.08)_33%,transparent_34%,transparent_65%,rgba(37,99,235,0.08)_66%,transparent_67%),linear-gradient(180deg,transparent_32%,rgba(37,99,235,0.08)_33%,transparent_34%,transparent_65%,rgba(37,99,235,0.08)_66%,transparent_67%)]" />
-                  {photos[0] ? (
-                    <img src={photos[0]} alt="形象分析照片预览" className="relative z-10 h-full w-full object-cover" />
-                  ) : (
-                    <>
-                      <img
-                        src="/image-analysis/appearance-cartoon.png"
-                        alt="职业形象示例"
-                        className="relative z-10 h-full w-full scale-[1.08] object-cover opacity-95 transition duration-500 group-hover:scale-[1.1]"
-                      />
-                      <div className="absolute inset-0 z-20 bg-gradient-to-b from-white/10 via-transparent to-slate-950/35" />
-                      <div className="absolute bottom-5 left-5 right-5 z-30 flex items-end justify-between gap-4">
-                        <div>
-                          <p className="text-sm font-black text-white">职业形象示例</p>
-                          <p className="mt-1 text-xs font-semibold text-white/85">上传本人照片后，这里会替换为实际预览</p>
-                        </div>
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3 text-xs font-bold text-slate-500">
+                <span className="text-slate-900">照片预览与拍摄要点</span>
+                <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">正面 / 上半身 / 光线均匀</span>
+              </div>
+              <div className="relative mx-4 mt-4 flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
+                <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_32%,rgba(37,99,235,0.08)_33%,transparent_34%,transparent_65%,rgba(37,99,235,0.08)_66%,transparent_67%),linear-gradient(180deg,transparent_32%,rgba(37,99,235,0.08)_33%,transparent_34%,transparent_65%,rgba(37,99,235,0.08)_66%,transparent_67%)]" />
+                {photos[0] ? (
+                  <img src={photos[0]} alt="形象分析照片预览" className="relative z-10 h-full w-full object-cover" />
+                ) : (
+                  <>
+                    <img
+                      src="/image-analysis/appearance-cartoon.png"
+                      alt="职业形象示例"
+                      className="relative z-10 h-full w-full scale-[1.08] object-cover opacity-95 transition duration-500 group-hover:scale-[1.1]"
+                    />
+                    <div className="absolute inset-0 z-20 bg-gradient-to-b from-white/10 via-transparent to-slate-950/35" />
+                    <div className="absolute bottom-5 left-5 right-5 z-30 flex items-end justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-black text-white">职业形象示例</p>
+                        <p className="mt-1 text-xs font-semibold text-white/85">上传本人照片后，这里会替换为实际预览</p>
                       </div>
-                    </>
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    className="hidden"
-                    onChange={(e) => e.target.files && handleFiles(e.target.files)}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2 px-4 py-3">
-                  {PHOTO_GUIDE.map(([title, desc]) => (
-                    <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
-                      <p className="flex items-center gap-1.5 text-xs font-black text-slate-800">
-                        <Check className="size-3 text-blue-600" />
-                        {title}
-                      </p>
-                      <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-4 text-slate-500">{desc}</p>
                     </div>
-                  ))}
-                </div>
-                <div className="flex items-center justify-between bg-white px-4 py-3 text-xs font-bold text-slate-500">
-                  <span>{photos[0] ? "已上传照片，可点击替换" : "建议上传证件照或上半身职业照"}</span>
-                  <span className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm">
-                    {photos[0] ? "更换照片" : "上传照片"}
-                  </span>
-                </div>
+                  </>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => e.target.files && handleFiles(e.target.files)}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-2 px-4 py-3">
+                {PHOTO_GUIDE.map(([title, desc]) => (
+                  <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
+                    <p className="flex items-center gap-1.5 text-xs font-black text-slate-800">
+                      <Check className="size-3 text-blue-600" />
+                      {title}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-4 text-slate-500">{desc}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between px-4 py-3 text-xs font-bold text-slate-500">
+                <span>{photos[0] ? "已上传照片，可点击替换" : "建议上传证件照或上半身职业照"}</span>
+                <span className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm">
+                  {photos[0] ? "更换照片" : "上传照片"}
+                </span>
               </div>
             </div>
           </section>
@@ -433,23 +431,13 @@ export default function ImageAnalysis({ onResultChange }: Props) {
 
         <aside className="flex h-full min-h-0 flex-col rounded-[34px] border border-slate-200 bg-white/95 p-6 shadow-[0_22px_70px_rgba(15,23,42,0.075)]">
           <div className="min-h-0 flex-1 overflow-y-auto pr-1">
-          <h2 className="text-2xl font-black tracking-[-0.035em] text-slate-950">准备状态</h2>
-          <div className="mt-4 rounded-[26px] border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-5">
-            <div className="flex items-end gap-2">
-              <span className="text-6xl font-black leading-none tracking-[-0.07em] text-slate-950">{readiness}</span>
-              <span className="mb-1 text-lg font-black text-slate-500">/ 100</span>
-            </div>
-            <p className="mt-3 text-sm font-bold leading-6 text-slate-600">{readinessText}</p>
-          </div>
-
-          <div className="mt-4 grid gap-3">
-            <ChecklistItem state={photos.length > 0 ? "done" : "todo"} index="01" title="上传照片" desc={photos.length > 0 ? "已识别到照片，可用于形象分析。" : "建议上传上半身或证件照风格照片。"} />
-            <ChecklistItem state={bmi ? "warn" : "todo"} index="02" title="身体数据" desc={bmi ? `BMI ${bmi.bmi}（${bmi.categoryLabel}），报告会给出比例建议。` : "补充身高体重后，建议会更贴合个人情况。"} />
-            <ChecklistItem state={safeAnalysisResult ? "done" : "todo"} index="03" title="生成形象报告" desc={safeAnalysisResult ? "报告已生成，可查看下方详细建议。" : "分析完成后展示职业感、岗位适配和调整建议。"} />
-          </div>
+          <h2 className="text-2xl font-black tracking-[-0.035em] text-slate-950">分析建议</h2>
+          <p className="mt-2 text-sm font-semibold leading-6 text-slate-500">
+            上传照片并补充信息后，AI 会围绕面试出镜场景给出可执行的形象调整建议。
+          </p>
 
           <div className="mt-4 rounded-[24px] bg-slate-950 p-5 text-white">
-            <h3 className="text-base font-black">报告会回答什么</h3>
+            <h3 className="text-base font-black">重点推荐方向</h3>
             <div className="mt-3 space-y-2 text-xs font-semibold leading-5 text-slate-300">
               <p>当前形象最影响面试观感的问题是什么</p>
               <p>哪些地方必须改，哪些只是建议优化</p>
@@ -496,6 +484,19 @@ export default function ImageAnalysis({ onResultChange }: Props) {
           </div>
 
           <div className="mt-4 border-t border-slate-200 pt-4">
+            <div className="mb-3 rounded-[20px] border border-blue-100 bg-blue-50/70 p-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-xs font-black text-slate-700">分析准备度</span>
+                <span className="text-xs font-black text-blue-700">{readiness}%</span>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
+                <div
+                  className="h-full rounded-full bg-blue-600 transition-all"
+                  style={{ width: `${readiness}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{readinessText}</p>
+            </div>
             <button
               onClick={doAnalyze}
               disabled={!canAnalyze}
