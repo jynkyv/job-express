@@ -2,10 +2,9 @@
 
 import { useState, useMemo, useEffect, useCallback } from "react"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { POSITIONS } from "@/features/career/lib/prompts"
-import { isQwenConfigured } from "@/features/career/lib/config"
+import { isOpenAIConfigured } from "@/features/career/lib/config"
 import { usePhotoUpload } from "@/features/career/hooks/usePhotoUpload"
 import { usePhotoValidation } from "@/features/career/hooks/usePhotoValidation"
 import { useImageAnalysis } from "@/features/career/hooks/useImageAnalysis"
@@ -14,8 +13,6 @@ import type { BmiData, ImageAnalysisV2Result } from "@/features/career/types"
 import type { SharedImageResult } from "@/features/career/context/AppContext"
 import {
   Upload,
-  X,
-  Camera,
   Sparkles,
   Loader2,
   AlertCircle,
@@ -52,13 +49,6 @@ function calcBmi(h: number, w: number): BmiData {
   else { category = "obese"; label = "肥胖" }
   return { height: h, weight: w, bmi, category, categoryLabel: label }
 }
-
-const BMI_SEGMENTS = [
-  { max: 18.5, color: "bg-blue-400" },
-  { max: 24, color: "bg-emerald-500" },
-  { max: 28, color: "bg-amber-400" },
-  { max: 40, color: "bg-red-400" },
-]
 
 const TABS: { key: AnalysisTab; label: string; icon: typeof Shirt }[] = [
   { key: "outfit", label: "着装分析", icon: Shirt },
@@ -182,11 +172,11 @@ export default function ImageAnalysis({ onResultChange }: Props) {
 
   const {
     photos, processedPhotos, isDragging, fileInputRef, dropRef,
-    handleFiles, removePhoto, clearPhotos,
+    handleFiles, clearPhotos,
   } = usePhotoUpload(2)
 
   const { validation, isValidating: isValidatingPhoto, validatePhoto, clearValidation } = usePhotoValidation()
-  const { phase, step, result: analysisResult, error: analysisError, retryCount, analyze, reset: resetAnalysis } = useImageAnalysis()
+  const { phase, result: analysisResult, error: analysisError, retryCount, analyze, reset: resetAnalysis } = useImageAnalysis()
   const safeAnalysisResult = useMemo(
     () => analysisResult ? normalizeImageAnalysisResult(analysisResult) : null,
     [analysisResult]
@@ -198,10 +188,6 @@ export default function ImageAnalysis({ onResultChange }: Props) {
     if (!h || !w || h <= 0 || w <= 0) return null
     return calcBmi(h, w)
   }, [height, weight])
-
-  const bmiPercent = useMemo(() =>
-    bmi ? Math.min(Math.max((bmi.bmi / 40) * 100, 2), 98) : 0
-  , [bmi])
 
   const positionLabel = POSITIONS.find((p) => p.value === position)?.label || "通用岗位"
   const isLoading = phase === "analyzing" || phase === "parsing" || phase === "validating"
@@ -277,8 +263,8 @@ export default function ImageAnalysis({ onResultChange }: Props) {
     onResultChange(null)
     setActiveTab("outfit")
 
-    if (!isQwenConfigured()) {
-      setError("请先在设置中配置通义千问 API 密钥（DashScope）")
+    if (!isOpenAIConfigured()) {
+      setError("请先在设置中配置 OpenAI API 密钥")
       return
     }
 
@@ -294,40 +280,86 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   }, [clearPhotos, clearValidation, resetAnalysis, onResultChange])
 
   return (
-    <div className="h-full overflow-y-auto bg-[#eef4fb] px-6 pb-6 pt-20">
-      <div className="grid min-h-[calc(100vh-6.5rem)] grid-cols-[minmax(0,1fr)_390px] gap-5 max-xl:grid-cols-1">
-        <main className="rounded-[34px] border border-slate-200 bg-white/95 p-7 shadow-[0_22px_70px_rgba(15,23,42,0.075)]">
-          <section className="grid grid-cols-[minmax(0,1fr)_520px] gap-6 max-2xl:grid-cols-[minmax(0,1fr)_460px] max-lg:grid-cols-1">
-            <div>
-              <p className="text-sm font-black text-blue-600">面试出镜准备舱</p>
-              <h1 className="mt-3 text-[42px] font-black leading-tight tracking-[-0.04em] text-slate-950 max-lg:text-3xl">
-                面试前，先确认你的形象是否稳妥
-              </h1>
-              <p className="mt-4 max-w-3xl text-base font-medium leading-8 text-slate-500">
-                上传一张面试出镜照片，补充基础身体数据和目标岗位。系统会先确认照片是否适合分析，再围绕着装职业感、发型面容、仪态比例与岗位适配，生成一份可执行的形象调整建议。
-              </p>
-              <div className="mt-5 flex flex-wrap gap-2.5">
-                {["照片仅用于本次分析", "按岗位给出建议", "分析后进入报告区"].map((item) => (
-                  <span key={item} className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-700">
-                    {item}
-                  </span>
-                ))}
+    <div className="h-full overflow-hidden bg-[#eef4fb] px-6 pb-6 pt-20">
+      <div className="grid h-[calc(100vh-6.5rem)] min-h-0 grid-cols-[minmax(0,1fr)_390px] gap-5 max-xl:grid-cols-1">
+        <main className="flex h-full min-h-0 flex-col rounded-[34px] border border-slate-200 bg-white/95 p-7 shadow-[0_22px_70px_rgba(15,23,42,0.075)]">
+          <section className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_430px] gap-6 max-2xl:grid-cols-[minmax(0,1fr)_400px] max-lg:grid-cols-1">
+            <div className="flex min-h-0 flex-col">
+              <div>
+                <p className="text-sm font-black text-blue-600">面试出镜准备舱</p>
+                <h1 className="mt-3 text-[42px] font-black leading-tight tracking-[-0.04em] text-slate-950 max-lg:text-3xl">
+                  面试前，先确认你的形象是否稳妥
+                </h1>
+                <p className="mt-4 max-w-3xl text-base font-medium leading-8 text-slate-500">
+                  上传一张面试出镜照片，补充基础身体数据和目标岗位。系统会先确认照片是否适合分析，再围绕着装职业感、发型面容、仪态比例与岗位适配，生成一份可执行的形象调整建议。
+                </p>
+                <div className="mt-5 flex flex-wrap gap-2.5">
+                  {["照片仅用于本次分析", "按岗位给出建议", "分析后进入报告区"].map((item) => (
+                    <span key={item} className="inline-flex items-center rounded-full border border-blue-100 bg-blue-50 px-3.5 py-2 text-xs font-bold text-blue-700">
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-auto rounded-[28px] border border-blue-100 bg-gradient-to-b from-slate-50 to-white p-5">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="text-lg font-black text-slate-900">补充必要信息</h2>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">用于个性化建议</span>
+                </div>
+                <div className="grid grid-cols-4 gap-3 max-lg:grid-cols-2">
+                  <Field label="年龄">
+                    <NumberStepper value={age} onChange={setAge} placeholder="25" unit="" min={16} max={70} ariaName="年龄" />
+                  </Field>
+                  <Field label="性别">
+                    <Select value={gender} onValueChange={setGender}>
+                      <SelectTrigger className="h-9 border-0 bg-transparent p-0 text-base font-black shadow-none focus:ring-0">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">男</SelectItem>
+                        <SelectItem value="female">女</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </Field>
+                  <Field label="身高">
+                    <NumberStepper value={height} onChange={setHeight} placeholder="170" unit="cm" min={120} max={220} ariaName="身高" />
+                  </Field>
+                  <Field label="体重">
+                    <NumberStepper value={weight} onChange={setWeight} placeholder="50" unit="kg" min={30} max={180} ariaName="体重" />
+                  </Field>
+                  <div className="col-span-2 max-lg:col-span-1">
+                    <Field label="目标岗位">
+                      <Select value={position} onValueChange={setPosition}>
+                        <SelectTrigger className="h-9 border-0 bg-transparent p-0 text-base font-black shadow-none focus:ring-0">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {POSITIONS.map((p) => (<SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>))}
+                        </SelectContent>
+                      </Select>
+                    </Field>
+                  </div>
+                  <Field label="照片类型">
+                    <p className="pt-1 text-base font-black text-slate-900">{photos[0] ? "已上传" : "待上传"}</p>
+                  </Field>
+                </div>
               </div>
             </div>
 
             <div
               ref={dropRef}
               onClick={() => fileInputRef.current?.click()}
-              className={`group relative min-h-[330px] cursor-pointer overflow-hidden rounded-[28px] border border-blue-100 bg-white p-4 shadow-sm transition-all ${
+              className={`group relative min-h-0 cursor-pointer overflow-hidden rounded-[28px] border border-blue-100 bg-white p-4 shadow-sm transition-all ${
                 isDragging ? "scale-[1.01] border-blue-300 ring-4 ring-blue-100" : "hover:border-blue-200 hover:shadow-md"
               }`}
             >
-              <div className="relative z-10 flex h-full min-h-[298px] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white">
+              <div className="relative z-10 flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white">
                 <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 text-xs font-bold text-slate-500">
-                  <span className="text-slate-900">照片预览区</span>
+                  <span className="text-slate-900">照片预览与拍摄要点</span>
                   <span className="rounded-full bg-blue-50 px-3 py-1 text-blue-700">正面 / 上半身 / 光线均匀</span>
                 </div>
-                <div className="relative mx-4 mt-4 flex flex-1 items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
+                <div className="relative mx-4 mt-4 flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-[22px] border border-slate-200 bg-slate-50">
                   <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_32%,rgba(37,99,235,0.08)_33%,transparent_34%,transparent_65%,rgba(37,99,235,0.08)_66%,transparent_67%),linear-gradient(180deg,transparent_32%,rgba(37,99,235,0.08)_33%,transparent_34%,transparent_65%,rgba(37,99,235,0.08)_66%,transparent_67%)]" />
                   {photos[0] ? (
                     <img src={photos[0]} alt="形象分析照片预览" className="relative z-10 h-full w-full object-cover" />
@@ -344,7 +376,6 @@ export default function ImageAnalysis({ onResultChange }: Props) {
                           <p className="text-sm font-black text-white">职业形象示例</p>
                           <p className="mt-1 text-xs font-semibold text-white/85">上传本人照片后，这里会替换为实际预览</p>
                         </div>
-                        <span className="rounded-full bg-blue-600 px-3 py-1.5 text-xs font-black text-white shadow-sm">点击上传</span>
                       </div>
                     </>
                   )}
@@ -357,135 +388,24 @@ export default function ImageAnalysis({ onResultChange }: Props) {
                     onChange={(e) => e.target.files && handleFiles(e.target.files)}
                   />
                 </div>
+                <div className="grid grid-cols-2 gap-2 px-4 py-3">
+                  {PHOTO_GUIDE.map(([title, desc]) => (
+                    <div key={title} className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2">
+                      <p className="flex items-center gap-1.5 text-xs font-black text-slate-800">
+                        <Check className="size-3 text-blue-600" />
+                        {title}
+                      </p>
+                      <p className="mt-1 line-clamp-2 text-[11px] font-medium leading-4 text-slate-500">{desc}</p>
+                    </div>
+                  ))}
+                </div>
                 <div className="flex items-center justify-between bg-white px-4 py-3 text-xs font-bold text-slate-500">
-                  <span>{photos[0] ? "已上传照片，可继续替换或补充第二张" : "建议上传证件照或上半身职业照"}</span>
+                  <span>{photos[0] ? "已上传照片，可点击替换" : "建议上传证件照或上半身职业照"}</span>
                   <span className="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-black text-white shadow-sm">
                     {photos[0] ? "更换照片" : "上传照片"}
                   </span>
                 </div>
               </div>
-            </div>
-          </section>
-
-          <section className="mt-5 grid grid-cols-[minmax(0,1fr)_minmax(360px,0.92fr)] gap-5 max-xl:grid-cols-1">
-            <div className="rounded-[28px] border border-blue-100 bg-gradient-to-b from-slate-50 to-white p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-black text-slate-900">补充必要信息</h2>
-                <span className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">用于个性化建议</span>
-              </div>
-              <div className="grid grid-cols-4 gap-3 max-lg:grid-cols-2">
-                <Field label="年龄">
-                  <NumberStepper value={age} onChange={setAge} placeholder="25" unit="" min={16} max={70} ariaName="年龄" />
-                </Field>
-                <Field label="性别">
-                  <Select value={gender} onValueChange={setGender}>
-                    <SelectTrigger className="h-9 border-0 bg-transparent p-0 text-base font-black shadow-none focus:ring-0">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">男</SelectItem>
-                      <SelectItem value="female">女</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </Field>
-                <Field label="身高">
-                  <NumberStepper value={height} onChange={setHeight} placeholder="170" unit="cm" min={120} max={220} ariaName="身高" />
-                </Field>
-                <Field label="体重">
-                  <NumberStepper value={weight} onChange={setWeight} placeholder="50" unit="kg" min={30} max={180} ariaName="体重" />
-                </Field>
-                <div className="col-span-2 max-lg:col-span-1">
-                  <Field label="目标岗位">
-                    <Select value={position} onValueChange={setPosition}>
-                      <SelectTrigger className="h-9 border-0 bg-transparent p-0 text-base font-black shadow-none focus:ring-0">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {POSITIONS.map((p) => (<SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                </div>
-                <Field label="照片类型">
-                  <p className="pt-1 text-base font-black text-slate-900">{photos[0] ? "已上传" : "待上传"}</p>
-                </Field>
-              </div>
-
-              {bmi ? (
-                <div className="mt-4 rounded-[22px] border border-blue-100 bg-blue-50 p-4">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-4xl font-black leading-none tracking-tight text-slate-900">{bmi.bmi}</p>
-                      <p className="mt-2 text-xs font-bold text-slate-500">BMI {bmi.categoryLabel}，报告会给出轮廓和穿搭比例建议</p>
-                    </div>
-                    <Badge className={`rounded-full px-3 py-1 text-xs font-bold ${
-                      bmi.category === "normal" ? "bg-emerald-100 text-emerald-700" :
-                      bmi.category === "underweight" ? "bg-blue-100 text-blue-700" :
-                      bmi.category === "overweight" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"
-                    }`}>{bmi.categoryLabel}</Badge>
-                  </div>
-                  <div className="mt-4 flex h-2 overflow-hidden rounded-full bg-slate-200">
-                    {BMI_SEGMENTS.map((seg, i) => (
-                      <div key={i} className={`h-full ${seg.color}`} style={{ width: `${((seg.max - (i === 0 ? 0 : BMI_SEGMENTS[i - 1].max)) / 40) * 100}%` }} />
-                    ))}
-                  </div>
-                  <div className="relative h-0">
-                    <div className="absolute -top-[7px] size-3 -translate-x-1/2 rounded-full border-2 border-white bg-blue-600 shadow" style={{ left: `${bmiPercent}%` }} />
-                  </div>
-                </div>
-              ) : (
-                <div className="mt-4 rounded-[22px] border border-dashed border-blue-100 bg-blue-50/60 p-4 text-sm font-bold text-slate-500">
-                  输入身高和体重后，系统会自动计算 BMI 并用于形象建议。
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-[28px] border border-blue-100 bg-gradient-to-b from-slate-50 to-white p-5">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-black text-slate-900">照片拍摄要点</h2>
-                <span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-700">推荐标准</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-                {PHOTO_GUIDE.map(([title, desc]) => (
-                  <div key={title} className="flex gap-2.5 rounded-2xl border border-slate-200 bg-white p-3">
-                    <span className="flex shrink-0 self-start items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-black text-blue-700">
-                      <Check className="size-3" />
-                      建议
-                    </span>
-                    <div>
-                      <p className="text-sm font-black text-slate-900">{title}</p>
-                      <p className="mt-1 text-xs font-medium leading-5 text-slate-500">{desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {photos.length > 0 && (
-                <div className="mt-4 flex items-center gap-3">
-                  {photos.map((url, i) => (
-                    <div key={i} className="group relative">
-                      <img src={url} alt={`照片 ${i + 1}`} className="size-20 rounded-2xl border border-slate-200 object-cover shadow-sm" />
-                      <button
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          removePhoto(i)
-                        }}
-                        className="absolute -right-1.5 -top-1.5 flex size-5 items-center justify-center rounded-full bg-red-500 text-white opacity-0 shadow transition group-hover:opacity-100"
-                      >
-                        <X className="size-3" />
-                      </button>
-                    </div>
-                  ))}
-                  {photos.length < 2 && (
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="flex size-20 items-center justify-center rounded-2xl border-2 border-dashed border-slate-200 bg-white text-slate-300 transition hover:border-blue-200 hover:text-blue-500"
-                    >
-                      <Camera className="size-5" />
-                    </button>
-                  )}
-                </div>
-              )}
             </div>
           </section>
 
@@ -509,48 +429,10 @@ export default function ImageAnalysis({ onResultChange }: Props) {
             </section>
           )}
 
-          <section className="mt-5 grid grid-cols-[minmax(0,1fr)_238px] gap-3 max-lg:grid-cols-1">
-            <div className="flex items-center gap-3 rounded-[22px] border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-4">
-              <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-sm font-black text-white">
-                {isLoading ? <Loader2 className="size-5 animate-spin" /> : "分析"}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                  <p className="text-sm font-black text-slate-900">
-                    {isLoading ? step.message : safeAnalysisResult ? "形象报告已生成" : "准备生成面试形象报告"}
-                  </p>
-                  <p className="mt-1 text-xs font-medium text-slate-500">
-                      {isLoading ? "正在根据照片、身体数据和目标岗位生成建议。" : "分析会输出职业感、仪容整洁度、岗位适配和具体调整建议。"}
-                  </p>
-                  </div>
-                  {isLoading && (
-                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-bold text-blue-600 shadow-sm">
-                      {Math.max(step.progress, 5)}%
-                    </span>
-                  )}
-                </div>
-                <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-blue-600 to-indigo-500 transition-all"
-                    style={{ width: `${isLoading ? Math.max(step.progress, 5) : safeAnalysisResult ? 100 : readiness}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={doAnalyze}
-              disabled={!canAnalyze}
-              className="inline-flex min-h-[84px] items-center justify-center gap-2 rounded-[22px] bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-base font-black text-white shadow-[0_16px_38px_rgba(37,99,235,0.24)] transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-500 disabled:opacity-70"
-            >
-              <Sparkles className="size-5" />
-              {isLoading ? "正在分析" : safeAnalysisResult ? "重新分析" : "开始 AI 形象分析"}
-            </button>
-          </section>
         </main>
 
-        <aside className="flex min-h-[calc(100vh-6.5rem)] flex-col rounded-[34px] border border-slate-200 bg-white/95 p-6 shadow-[0_22px_70px_rgba(15,23,42,0.075)]">
+        <aside className="flex h-full min-h-0 flex-col rounded-[34px] border border-slate-200 bg-white/95 p-6 shadow-[0_22px_70px_rgba(15,23,42,0.075)]">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-1">
           <h2 className="text-2xl font-black tracking-[-0.035em] text-slate-950">准备状态</h2>
           <div className="mt-4 rounded-[26px] border border-blue-100 bg-gradient-to-br from-blue-50 to-indigo-50 p-5">
             <div className="flex items-end gap-2">
@@ -611,6 +493,18 @@ export default function ImageAnalysis({ onResultChange }: Props) {
             <Shield className="size-3.5" />
             照片仅用于本次分析，结果保存在本地浏览器
           </button>
+          </div>
+
+          <div className="mt-4 border-t border-slate-200 pt-4">
+            <button
+              onClick={doAnalyze}
+              disabled={!canAnalyze}
+              className="inline-flex min-h-[64px] w-full items-center justify-center gap-2 rounded-[22px] bg-gradient-to-r from-blue-600 to-indigo-600 px-5 text-base font-black text-white shadow-[0_16px_38px_rgba(37,99,235,0.24)] transition hover:from-blue-700 hover:to-indigo-700 disabled:cursor-not-allowed disabled:from-slate-400 disabled:to-slate-500 disabled:opacity-70"
+            >
+              {isLoading ? <Loader2 className="size-5 animate-spin" /> : <Sparkles className="size-5" />}
+              {isLoading ? "正在分析" : safeAnalysisResult ? "重新分析" : "开始 AI 形象分析"}
+            </button>
+          </div>
         </aside>
       </div>
 
@@ -621,7 +515,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
             <div>
               <p className="text-sm font-black text-slate-900">隐私保护说明</p>
               <p className="mt-2 text-sm leading-6 text-slate-500">
-                照片仅用于本次形象分析，不会写入简历文件。使用 AI 分析时，照片和必要身体数据会发送到当前配置的通义千问服务；分析结果仅保存在当前浏览器。
+                照片仅用于本次形象分析，不会写入简历文件。使用 AI 分析时，照片和必要身体数据会发送到当前配置的 OpenAI 服务；分析结果仅保存在当前浏览器。
               </p>
               <button onClick={() => setShowPrivacy(false)} className="mt-3 rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white">
                 我知道了

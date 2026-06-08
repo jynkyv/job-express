@@ -3,6 +3,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { fileURLToPath } from "node:url";
+import { nitro } from "nitro/vite";
 
 export default defineConfig({
   resolve: {
@@ -19,6 +20,7 @@ export default defineConfig({
     tanstackStart({
       srcDirectory: "src"
     }),
+    nitro(),
     viteReact()
   ]
 });

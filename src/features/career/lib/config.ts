@@ -16,6 +16,12 @@ export interface QwenConfig {
   model: string
 }
 
+export interface OpenAIConfig {
+  apiKey: string
+  baseURL: string
+  imageModel: string
+}
+
 export interface SpeechConfig {
   provider: "browser" | "dashscope"
 }
@@ -23,6 +29,7 @@ export interface SpeechConfig {
 export interface GlobalAPIConfig {
   deepseek: DeepSeekConfig
   qwen: QwenConfig
+  openai: OpenAIConfig
   speech: SpeechConfig
   mockAIEnabled: boolean
 }
@@ -39,6 +46,12 @@ const DEFAULT_QWEN: QwenConfig = {
   model: "qwen3.6-plus",
 }
 
+const DEFAULT_OPENAI: OpenAIConfig = {
+  apiKey: "",
+  baseURL: "https://api.openai.com/v1",
+  imageModel: "gpt-4.1-mini",
+}
+
 const DEFAULT_SPEECH: SpeechConfig = {
   provider: "browser",
 }
@@ -47,6 +60,7 @@ export function getDefaultConfig(): GlobalAPIConfig {
   return {
     deepseek: { ...DEFAULT_DEEPSEEK },
     qwen: { ...DEFAULT_QWEN },
+    openai: { ...DEFAULT_OPENAI },
     speech: { ...DEFAULT_SPEECH },
     mockAIEnabled: false,
   }
@@ -66,6 +80,11 @@ export function loadConfig(): GlobalAPIConfig {
       baseURL: state.qwenApiEndpoint,
       model: state.qwenModelId,
     },
+    openai: {
+      ...DEFAULT_OPENAI,
+      apiKey: state.openaiApiKey,
+      imageModel: state.openaiImageModelId,
+    },
     speech: {
       provider: state.speechProvider,
     },
@@ -79,6 +98,8 @@ export function saveConfig(config: GlobalAPIConfig): void {
   state.setDeepseekModelId(config.deepseek.model)
   state.setQwenApiKey(config.qwen.apiKey)
   state.setQwenModelId(config.qwen.model)
+  state.setOpenAIApiKey(config.openai.apiKey)
+  state.setOpenAIImageModelId(config.openai.imageModel)
   state.setSpeechProvider(config.speech.provider)
   state.setMockAIEnabled(config.mockAIEnabled)
 }
@@ -115,4 +136,14 @@ export function isQwenConfigured(): boolean {
   if (isMockAIEnabled()) return true
   const cfg = loadConfig().qwen
   return !!cfg.apiKey && !!cfg.baseURL && !!cfg.model
+}
+
+export function getOpenAIConfig(): OpenAIConfig {
+  return loadConfig().openai
+}
+
+export function isOpenAIConfigured(): boolean {
+  if (isMockAIEnabled()) return true
+  const cfg = loadConfig().openai
+  return !!cfg.apiKey && !!cfg.baseURL && !!cfg.imageModel
 }

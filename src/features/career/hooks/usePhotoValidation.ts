@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { callTongyiWithImage } from "@/features/career/lib/tongyi"
+import { callOpenAIWithImage } from "@/features/career/lib/openai-image"
 import { SYSTEM_PROMPTS } from "@/features/career/lib/prompts"
 import type { PhotoValidationResult } from "@/features/career/types"
 
@@ -22,10 +22,11 @@ export function usePhotoValidation(): PhotoValidationState {
     setValidation(null)
 
     try {
-      const text = await callTongyiWithImage(
+      const text = await callOpenAIWithImage(
         base64,
         "请评估这张照片是否适合用于职业形象分析。",
         SYSTEM_PROMPTS.photoValidation,
+        "validation",
       )
       const cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim()
       const match = cleaned.match(/\{[\s\S]*\}/)

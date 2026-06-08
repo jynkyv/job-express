@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useCallback, useRef } from "react"
-import { callTongyiWithImage, TongyiNotConfiguredError } from "@/features/career/lib/tongyi"
-import { getQwenConfig } from "@/features/career/lib/config"
+import { callOpenAIWithImage, OpenAINotConfiguredError } from "@/features/career/lib/openai-image"
+import { getOpenAIConfig } from "@/features/career/lib/config"
 import { SYSTEM_PROMPTS, POSITIONS } from "@/features/career/lib/prompts"
 import type { BmiData, ImageAnalysisV2Result } from "@/features/career/types"
 
@@ -32,7 +32,7 @@ export interface ImageAnalysisState {
 const ANALYSIS_STEPS: Record<AnalysisPhase, { message: string; progress: number }> = {
   idle:           { message: "", progress: 0 },
   validating:     { message: "正在校验照片质量...", progress: 10 },
-  analyzing:      { message: "AI 正在分析照片...", progress: 30 },
+  analyzing:      { message: "OpenAI 正在分析照片...", progress: 30 },
   parsing:        { message: "正在整理分析结果...", progress: 80 },
   complete:       { message: "分析完成", progress: 100 },
   error:          { message: "分析失败", progress: 0 },
@@ -100,13 +100,13 @@ export function useImageAnalysis() {
         await delay(1000 * attempt) // 递增等待
       }
 
-      // 尝试主模型
       try {
-        const { model } = getQwenConfig()
-        const fullText = await callTongyiWithImage(
+        const { imageModel } = getOpenAIConfig()
+        const fullText = await callOpenAIWithImage(
           photosUsed,
           analysisText,
           SYSTEM_PROMPTS.imageAnalysisV2,
+          "analysis",
           onChunk,
         )
 
@@ -114,7 +114,7 @@ export function useImageAnalysis() {
 
         setPhase("parsing")
         const parsed = extractJson(fullText) as ImageAnalysisV2Result
-        setResult({ ...parsed, analyzed_at: new Date().toISOString(), model_used: model })
+        setResult({ ...parsed, analyzed_at: new Date().toISOString(), model_used: imageModel })
         setPhase("complete")
         setError("")
         return
@@ -122,7 +122,7 @@ export function useImageAnalysis() {
         lastError = e instanceof Error ? e : new Error("未知错误")
 
         // 配置错误不重试
-        if (e instanceof TongyiNotConfiguredError) {
+        if (e instanceof OpenAINotConfiguredError) {
           setError(e.message)
           setPhase("error")
           return
@@ -133,31 +133,6 @@ export function useImageAnalysis() {
           setError("AI 返回数据格式异常，请重试")
           setPhase("error")
           return
-        }
-
-        // 最后尝试用 fallback 模型
-        if (attempt === MAX_RETRIES && lastError) {
-          // 尝试降级到 flash 模型
-          try {
-            const fallbackText = await callTongyiWithImage(
-              photosUsed,
-              analysisText,
-              SYSTEM_PROMPTS.imageAnalysisV2,
-              onChunk,
-              "qwen3.6-flash",
-            )
-
-            if (abortRef.current) return
-
-            setPhase("parsing")
-            const parsed = extractJson(fallbackText) as ImageAnalysisV2Result
-            setResult({ ...parsed, analyzed_at: new Date().toISOString(), model_used: "qwen3.6-flash (fallback)" })
-            setPhase("complete")
-            setError("")
-            return
-          } catch {
-            // fallback 也失败
-          }
         }
 
         // 只有网络/服务器错误才继续重试

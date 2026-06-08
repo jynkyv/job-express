@@ -12,6 +12,11 @@ const normalizeQwenModel = (modelId?: string) =>
     ? modelId!
     : "qwen3.6-plus";
 
+const normalizeOpenAIImageModel = (modelId?: string) =>
+  ["gpt-4.1-mini", "gpt-4.1", "gpt-5.1"].includes(modelId || "")
+    ? modelId!
+    : "gpt-4.1-mini";
+
 interface AIConfigState {
   selectedModel: AIModelType;
   deepseekApiKey: string;
@@ -19,12 +24,16 @@ interface AIConfigState {
   qwenApiKey: string;
   qwenModelId: string;
   qwenApiEndpoint: string;
+  openaiApiKey: string;
+  openaiImageModelId: string;
   speechProvider: "browser" | "dashscope";
   mockAIEnabled: boolean;
   setDeepseekApiKey: (apiKey: string) => void;
   setDeepseekModelId: (modelId: string) => void;
   setQwenApiKey: (apiKey: string) => void;
   setQwenModelId: (modelId: string) => void;
+  setOpenAIApiKey: (apiKey: string) => void;
+  setOpenAIImageModelId: (modelId: string) => void;
   setSpeechProvider: (provider: "browser" | "dashscope") => void;
   setMockAIEnabled: (enabled: boolean) => void;
   isConfigured: () => boolean;
@@ -39,12 +48,16 @@ export const useAIConfigStore = create<AIConfigState>()(
       qwenApiKey: "",
       qwenModelId: "qwen3.6-plus",
       qwenApiEndpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+      openaiApiKey: "",
+      openaiImageModelId: "gpt-4.1-mini",
       speechProvider: "browser",
       mockAIEnabled: false,
       setDeepseekApiKey: (apiKey: string) => set({ deepseekApiKey: apiKey }),
       setDeepseekModelId: (modelId: string) => set({ deepseekModelId: modelId }),
       setQwenApiKey: (apiKey: string) => set({ qwenApiKey: apiKey }),
       setQwenModelId: (modelId: string) => set({ qwenModelId: modelId }),
+      setOpenAIApiKey: (apiKey: string) => set({ openaiApiKey: apiKey }),
+      setOpenAIImageModelId: (modelId: string) => set({ openaiImageModelId: modelId }),
       setSpeechProvider: (provider: "browser" | "dashscope") => set({ speechProvider: provider }),
       setMockAIEnabled: (enabled: boolean) => set({ mockAIEnabled: enabled }),
       isConfigured: () => {
@@ -64,6 +77,8 @@ export const useAIConfigStore = create<AIConfigState>()(
         qwenApiKey: persistedState?.qwenApiKey || "",
         qwenModelId: normalizeQwenModel(persistedState?.qwenModelId),
         qwenApiEndpoint: "https://dashscope.aliyuncs.com/compatible-mode/v1",
+        openaiApiKey: persistedState?.openaiApiKey || "",
+        openaiImageModelId: normalizeOpenAIImageModel(persistedState?.openaiImageModelId),
         speechProvider: persistedState?.speechProvider || "browser",
         mockAIEnabled: Boolean(persistedState?.mockAIEnabled),
       }),
@@ -76,6 +91,8 @@ export const useAIConfigStore = create<AIConfigState>()(
           state.deepseekModelId = normalizeDeepseekModel(persistedState?.deepseekModelId || legacy.deepseek?.model);
           state.qwenApiKey ||= legacy.qwen?.apiKey || "";
           state.qwenModelId = normalizeQwenModel(persistedState?.qwenModelId || legacy.qwen?.model);
+          state.openaiApiKey ||= legacy.openai?.apiKey || "";
+          state.openaiImageModelId = normalizeOpenAIImageModel(persistedState?.openaiImageModelId || legacy.openai?.imageModel);
           state.speechProvider = persistedState?.speechProvider || legacy.speech?.provider || "browser";
           state.mockAIEnabled = Boolean(persistedState?.mockAIEnabled);
         } catch {

@@ -42,12 +42,16 @@ const SettingsPage = () => {
     deepseekModelId,
     qwenApiKey,
     qwenModelId,
+    openaiApiKey,
+    openaiImageModelId,
     speechProvider,
     mockAIEnabled,
     setDeepseekApiKey,
     setDeepseekModelId,
     setQwenApiKey,
     setQwenModelId,
+    setOpenAIApiKey,
+    setOpenAIImageModelId,
     setSpeechProvider,
     setMockAIEnabled,
   } = useAIConfigStore();
@@ -196,8 +200,8 @@ const SettingsPage = () => {
                     </div>
                     <div>
                       <CardTitle>开发模拟模式</CardTitle>
-                      <CardDescription className="mt-2 max-w-3xl leading-6">
-                        DeepSeek 或通义千问临时不可用时，开启后会使用本地示例数据跑通简历生成、模拟面试、照片校验和形象分析流程。此模式不会请求线上 AI 服务，结果仅用于开发和演示。
+                    <CardDescription className="mt-2 max-w-3xl leading-6">
+                        DeepSeek、OpenAI 或 DashScope 临时不可用时，开启后会使用本地示例数据跑通简历生成、模拟面试、照片校验和形象分析流程。此模式不会请求线上 AI 服务，结果仅用于开发和演示。
                       </CardDescription>
                     </div>
                   </div>
@@ -210,7 +214,7 @@ const SettingsPage = () => {
               {mockAIEnabled && (
                 <CardContent className="pt-0">
                   <div className="rounded-2xl border border-amber-200 bg-white/70 px-4 py-3 text-sm leading-6 text-amber-800">
-                    当前会绕过 API 密钥校验。恢复 DeepSeek / 通义千问后，关闭此开关即可回到真实模型。
+                    当前会绕过 API 密钥校验。恢复线上 AI 服务后，关闭此开关即可回到真实模型。
                   </div>
                 </CardContent>
               )}
@@ -260,9 +264,47 @@ const SettingsPage = () => {
                     <ScanFace className="size-6" />
                   </div>
                   <div>
-                    <CardTitle>通义千问视觉模型</CardTitle>
+                    <CardTitle>OpenAI 视觉分析</CardTitle>
                     <CardDescription className="mt-2 leading-6">
-                      用于职业形象照片分析。默认选择 Plus 以获得更稳定的图片理解效果；Flash 适合降低成本。
+                      用于职业形象照片校验和形象报告生成。默认使用 gpt-4.1-mini，兼顾图片理解效果、速度和成本。
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <Label htmlFor="openai-key">OpenAI API 密钥</Label>
+                    <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-blue-700 hover:underline">
+                      获取密钥 <ExternalLink className="size-3" />
+                    </a>
+                  </div>
+                  <Input id="openai-key" type="password" value={openaiApiKey} onChange={(event) => setOpenAIApiKey(event.target.value)} placeholder="sk-..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>图像分析模型</Label>
+                  <Select value={openaiImageModelId} onValueChange={setOpenAIImageModelId}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="gpt-4.1-mini">gpt-4.1-mini（推荐日常使用）</SelectItem>
+                      <SelectItem value="gpt-4.1">gpt-4.1（更强图片理解）</SelectItem>
+                      <SelectItem value="gpt-5.1">gpt-5.1（深度分析）</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-slate-200 shadow-sm">
+              <CardHeader>
+                <div className="flex items-start gap-4">
+                  <div className="rounded-xl bg-violet-50 p-3 text-violet-700">
+                    <ScanFace className="size-6" />
+                  </div>
+                  <div>
+                    <CardTitle>DashScope 语音转写</CardTitle>
+                    <CardDescription className="mt-2 leading-6">
+                      仅用于模拟面试的语音识别增强。形象分析已改用 OpenAI，不再依赖通义视觉模型。
                     </CardDescription>
                   </div>
                 </div>
@@ -273,12 +315,12 @@ const SettingsPage = () => {
                   <Input id="qwen-key" type="password" value={qwenApiKey} onChange={(event) => setQwenApiKey(event.target.value)} placeholder="sk-..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>视觉模型</Label>
+                  <Label>备用模型</Label>
                   <Select value={qwenModelId} onValueChange={setQwenModelId}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="qwen3.6-plus">qwen3.6-plus（推荐，效果优先）</SelectItem>
-                      <SelectItem value="qwen3.6-flash">qwen3.6-flash（经济模式）</SelectItem>
+                      <SelectItem value="qwen3.6-plus">qwen3.6-plus</SelectItem>
+                      <SelectItem value="qwen3.6-flash">qwen3.6-flash</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
