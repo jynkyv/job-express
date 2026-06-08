@@ -190,24 +190,25 @@ export default function ImageAnalysis({ onResultChange }: Props) {
 
   const positionLabel = POSITIONS.find((p) => p.value === position)?.label || "通用岗位"
   const isLoading = phase === "analyzing" || phase === "parsing" || phase === "validating"
-  const canAnalyze = bmi !== null && processedPhotos.length > 0 && !isLoading && !isValidatingPhoto
+  const hasPhoto = processedPhotos.length > 0
+  const hasRequiredInfo = bmi !== null && !!age && !!gender && !!position
+  const canAnalyze = hasPhoto && hasRequiredInfo && !isLoading
 
   const readiness = useMemo(() => {
+    if (safeAnalysisResult) return 100
     let score = 0
-    if (photos.length > 0) score += 34
-    if (bmi) score += 28
-    if (position) score += 12
+    if (hasPhoto) score += 45
+    if (bmi) score += 35
+    if (age && gender && position) score += 20
     if (validation?.is_valid) score += 18
-    else if (validation) score += 8
-    if (safeAnalysisResult) score = Math.max(score, 88)
     return Math.min(score, 100)
-  }, [photos.length, bmi, position, validation, safeAnalysisResult])
+  }, [hasPhoto, bmi, age, gender, position, validation, safeAnalysisResult])
 
   const readinessText = safeAnalysisResult
     ? "形象报告已生成，可以查看下方详细建议，也可以重新上传照片再分析。"
-    : readiness >= 75
+    : canAnalyze
       ? "照片与基础数据已基本齐全，可以开始生成形象报告。"
-      : photos.length === 0
+      : !hasPhoto
         ? "先上传一张上半身或证件照风格照片。"
         : "继续补充身体数据和目标岗位，报告会更贴合你的面试场景。"
 
