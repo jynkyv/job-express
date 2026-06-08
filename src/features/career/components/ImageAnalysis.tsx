@@ -193,19 +193,6 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   const hasPhoto = processedPhotos.length > 0
   const canAnalyze = hasPhoto && !isLoading
 
-  const readiness = useMemo(() => {
-    if (safeAnalysisResult) return 100
-    return hasPhoto ? 100 : 0
-  }, [safeAnalysisResult, hasPhoto])
-
-  const readinessText = safeAnalysisResult
-    ? "形象报告已生成，可以查看下方详细建议，也可以重新上传照片再分析。"
-    : canAnalyze
-      ? "照片与基础数据已基本齐全，可以开始生成形象报告。"
-      : !hasPhoto
-        ? "先上传一张上半身或证件照风格照片。"
-        : "继续补充身体数据和目标岗位，报告会更贴合你的面试场景。"
-
   useEffect(() => {
     if (analysisError) setError(analysisError)
   }, [analysisError])
@@ -473,19 +460,6 @@ export default function ImageAnalysis({ onResultChange }: Props) {
           </div>
 
           <div className="mt-4 border-t border-slate-200 pt-4">
-            <div className="mb-3 rounded-[20px] border border-blue-100 bg-blue-50/70 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <span className="text-xs font-black text-slate-700">分析准备度</span>
-                <span className="text-xs font-black text-blue-700">{readiness}%</span>
-              </div>
-              <div className="mt-3 h-2 overflow-hidden rounded-full bg-white">
-                <div
-                  className="h-full rounded-full bg-blue-600 transition-all"
-                  style={{ width: `${readiness}%` }}
-                />
-              </div>
-              <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{readinessText}</p>
-            </div>
             <button
               onClick={doAnalyze}
               disabled={!canAnalyze}
