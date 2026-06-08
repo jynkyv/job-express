@@ -207,6 +207,27 @@ export interface ImageAnalysisV2Result {
   fitness_guide?: FitnessGuideV2     // 运动指南（基于体态/身体数据）
 }
 
+// ====== 面试急训冲刺计划 ======
+export interface CrashPlanItem {
+  text: string
+  /** 仪容 / 着装 / 体态 / 状态 / 其他 */
+  category: string
+}
+
+export interface CrashPlanPhase {
+  title: string   // 阶段标题，如「现在就做」「面试前一天」「面试当天晨间」
+  window: string  // 时间窗口，如 D-3 ~ D-2 / D-1 / 面试当天
+  items: CrashPlanItem[]
+}
+
+export interface CrashPlanResult {
+  days_until: number
+  headline: string   // 一句话冲刺主旨
+  focus: string      // 当前最该补的短板
+  phases: CrashPlanPhase[]
+  avoid: string[]    // 面试前应避免清单
+}
+
 /** 照片质量校验结果 */
 export interface PhotoValidationResult {
   is_valid: boolean

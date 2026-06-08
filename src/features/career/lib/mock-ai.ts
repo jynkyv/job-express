@@ -259,3 +259,41 @@ export function getMockImageAnalysisResponse() {
     },
   })
 }
+
+export function getMockCrashPlanResponse(daysUntil = 3) {
+  return JSON.stringify({
+    days_until: daysUntil,
+    headline: "时间足够把减分项清零，重点把仪容和着装正式度提上来",
+    focus: "当前最该补的是着装正式度和发型边缘的清爽度，把第一眼的整洁感做上去。",
+    phases: [
+      {
+        title: "现在就做",
+        window: "D-3 ~ D-2",
+        items: [
+          { text: "把面试要穿的衬衫和外套熨烫平整并挂好备用", category: "着装" },
+          { text: "整理发型，修剪鬓角和发尾，露出额头显清爽", category: "仪容" },
+          { text: "每天靠墙站立 5 分钟改善含胸驼背", category: "体态" },
+        ],
+      },
+      {
+        title: "面试前一天",
+        window: "D-1",
+        items: [
+          { text: "23 点前入睡，保证 7-8 小时睡眠", category: "状态" },
+          { text: "晚餐清淡，避免油腻辛辣和产气食物", category: "状态" },
+          { text: "提前试穿全套正装，检查肩线、袖长和裤长", category: "着装" },
+        ],
+      },
+      {
+        title: "面试当天晨间",
+        window: "面试当天",
+        items: [
+          { text: "起床后靠墙站立 5 分钟，做 3 次深呼吸放松肩颈", category: "体态" },
+          { text: "出门前对镜检查领口、扣子、发型和面部控油", category: "仪容" },
+          { text: "正常吃早餐但别过饱，随身带一小瓶水", category: "状态" },
+        ],
+      },
+    ],
+    avoid: ["熬夜", "油腻辛辣饮食", "临时尝试新发型或新护肤品", "酒精和过量咖啡"],
+  })
+}
