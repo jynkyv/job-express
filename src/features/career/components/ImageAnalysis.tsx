@@ -160,11 +160,11 @@ interface Props {
 }
 
 export default function ImageAnalysis({ onResultChange }: Props) {
-  const [age, setAge] = useState("25")
-  const [gender, setGender] = useState("male")
-  const [height, setHeight] = useState("170")
-  const [weight, setWeight] = useState("50")
-  const [position, setPosition] = useState("general")
+  const [age, setAge] = useState("")
+  const [gender, setGender] = useState("")
+  const [height, setHeight] = useState("")
+  const [weight, setWeight] = useState("")
+  const [position, setPosition] = useState("")
   const [error, setError] = useState("")
   const [activeTab, setActiveTab] = useState<AnalysisTab>("outfit")
   const [showPrivacy, setShowPrivacy] = useState(false)
@@ -191,18 +191,12 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   const positionLabel = POSITIONS.find((p) => p.value === position)?.label || "通用岗位"
   const isLoading = phase === "analyzing" || phase === "parsing" || phase === "validating"
   const hasPhoto = processedPhotos.length > 0
-  const hasRequiredInfo = bmi !== null && !!age && !!gender && !!position
-  const canAnalyze = hasPhoto && hasRequiredInfo && !isLoading
+  const canAnalyze = hasPhoto && !isLoading
 
   const readiness = useMemo(() => {
     if (safeAnalysisResult) return 100
-    let score = 0
-    if (hasPhoto) score += 45
-    if (bmi) score += 35
-    if (age && gender && position) score += 20
-    if (validation?.is_valid) score += 18
-    return Math.min(score, 100)
-  }, [hasPhoto, bmi, age, gender, position, validation, safeAnalysisResult])
+    return hasPhoto ? 100 : 0
+  }, [safeAnalysisResult, hasPhoto])
 
   const readinessText = safeAnalysisResult
     ? "形象报告已生成，可以查看下方详细建议，也可以重新上传照片再分析。"
@@ -258,7 +252,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   }, [processedPhotos, phase, validatePhoto, clearValidation])
 
   const doAnalyze = useCallback(async () => {
-    if (!bmi || processedPhotos.length === 0) return
+    if (processedPhotos.length === 0) return
     setError("")
     onResultChange(null)
     setActiveTab("outfit")
@@ -309,7 +303,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
                   <Field label="性别">
                     <Select value={gender} onValueChange={setGender}>
                       <SelectTrigger className="h-9 border-0 bg-transparent p-0 text-base font-black shadow-none focus:ring-0">
-                        <SelectValue />
+                        <SelectValue placeholder="可选" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="male">男</SelectItem>
@@ -327,7 +321,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
                     <Field label="目标岗位">
                       <Select value={position} onValueChange={setPosition}>
                         <SelectTrigger className="h-9 border-0 bg-transparent p-0 text-base font-black shadow-none focus:ring-0">
-                          <SelectValue />
+                          <SelectValue placeholder="可选" />
                         </SelectTrigger>
                         <SelectContent>
                           {POSITIONS.map((p) => (<SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>))}

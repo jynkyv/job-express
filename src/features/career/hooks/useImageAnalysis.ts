@@ -64,7 +64,7 @@ export function useImageAnalysis() {
   }
 
   const analyze = useCallback(async (
-    bmi: BmiData,
+    bmi: BmiData | null,
     age: string,
     gender: string,
     position: string,
@@ -77,13 +77,16 @@ export function useImageAnalysis() {
     setResult(null)
     setRetryCount(0)
 
-    const posLabel = POSITIONS.find((p) => p.value === position)?.label || "通用"
+    const posLabel = POSITIONS.find((p) => p.value === position)?.label || "未填写"
     const photosUsed = processedPhotos[0]
     if (!photosUsed) { setError("请先上传照片"); setPhase("error"); return }
 
-    const genderLabel = gender === "male" ? "男" : "女"
+    const genderLabel = gender === "male" ? "男" : gender === "female" ? "女" : "未填写"
+    const bodyInfo = bmi
+      ? `年龄${age || "未填写"}岁，性别${genderLabel}，身高${bmi.height}cm，体重${bmi.weight}kg，BMI ${bmi.bmi}（${bmi.categoryLabel}）。`
+      : `年龄${age || "未填写"}，性别${genderLabel}，身高体重未填写。`
     const analysisText = [
-      `身体数据：年龄${age}岁，性别${genderLabel}，身高${bmi.height}cm，体重${bmi.weight}kg，BMI ${bmi.bmi}（${bmi.categoryLabel}）。`,
+      `身体数据：${bodyInfo}`,
       `目标岗位：${posLabel}。`,
       "请按照要求的 JSON 格式输出完整的职业形象分析。",
     ].join("")
