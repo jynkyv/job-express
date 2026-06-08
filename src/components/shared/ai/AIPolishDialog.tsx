@@ -19,7 +19,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
-import { AI_MODEL_CONFIGS } from "@/config/ai";
 import { cn } from "@/lib/utils";
 import { streamMockText } from "@/features/career/lib/mock-ai";
 
@@ -65,23 +64,13 @@ export default function AIPolishDialog({
   const [polishedContent, setPolishedContent] = useState("");
   const [customInstructions, setCustomInstructions] = useState("");
   const {
-    selectedModel,
-    deepseekApiKey,
-    deepseekModelId,
     mockAIEnabled,
-    isConfigured
   } = useAIConfigStore();
   const abortControllerRef = useRef<AbortController | null>(null);
   const polishedContentRef = useRef<HTMLDivElement>(null);
 
   const handlePolish = async () => {
     try {
-      if (!isConfigured()) {
-        toast.error(t("error.configRequired"));
-        onOpenChange(false);
-        return;
-      }
-
       setIsPolishing(true);
       setPolishedContent("");
 
@@ -100,7 +89,6 @@ export default function AIPolishDialog({
         return;
       }
 
-      const config = AI_MODEL_CONFIGS[selectedModel];
       const response = await fetch("/api/polish", {
         method: "POST",
         headers: {
@@ -108,9 +96,6 @@ export default function AIPolishDialog({
         },
         body: JSON.stringify({
           content: turndownService.turndown(content),
-          apiKey: deepseekApiKey,
-          model: config.requiresModelId ? deepseekModelId : config.defaultModel,
-          modelType: selectedModel,
           customInstructions: customInstructions.trim() || undefined
         }),
         signal: abortControllerRef.current.signal

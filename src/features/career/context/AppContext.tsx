@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
-import { isDeepSeekConfigured } from "@/features/career/lib/config"
 
 // ---- 共享形象分析结果 ----
 export interface SharedImageResult {
@@ -54,7 +53,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     typeof window !== "undefined" ? hashToPage(window.location.hash) : "home"
   )
   const [imageResult, setImageResult] = useState<SharedImageResult | null>(null)
-  const [apiConfigured, setApiConfigured] = useState(isDeepSeekConfigured)
+  const [apiConfigured, setApiConfigured] = useState(true)
 
   useEffect(() => {
     const onHashChange = () => setCurrentPage(hashToPage(window.location.hash))
@@ -69,7 +68,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       window.dispatchEvent(new PopStateEvent("popstate"))
     }
   }, [])
-  const refreshApiStatus = useCallback(() => setApiConfigured(isDeepSeekConfigured()), [])
+  const refreshApiStatus = useCallback(() => setApiConfigured(true), [])
   const openSettings = useCallback(() => {
     window.location.assign("/settings#ai")
   }, [])

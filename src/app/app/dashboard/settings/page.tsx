@@ -38,14 +38,10 @@ const SettingsPage = () => {
   const [folderPath, setFolderPath] = useState("");
   const [activeTab, setActiveTab] = useState("backup");
   const {
-    deepseekApiKey,
-    deepseekModelId,
     qwenApiKey,
     qwenModelId,
     speechProvider,
     mockAIEnabled,
-    setDeepseekApiKey,
-    setDeepseekModelId,
     setQwenApiKey,
     setQwenModelId,
     setSpeechProvider,
@@ -223,32 +219,18 @@ const SettingsPage = () => {
                     <BrainCircuit className="size-6" />
                   </div>
                   <div>
-                    <CardTitle>DeepSeek</CardTitle>
+                    <CardTitle>文本 AI</CardTitle>
                     <CardDescription className="mt-2 leading-6">
-                      用于简历润色、语法检查和模拟训练。Flash 更快、更经济；Pro 更适合需要深度分析的内容。
+                      用于简历润色、语法检查、模拟训练和职业建议。密钥与模型由服务器环境变量控制，默认模型为 gemini-3.1-flash-lite。
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label htmlFor="deepseek-key">API 密钥</Label>
-                    <a href="https://platform.deepseek.com" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-blue-700 hover:underline">
-                      获取密钥 <ExternalLink className="size-3" />
-                    </a>
-                  </div>
-                  <Input id="deepseek-key" type="password" value={deepseekApiKey} onChange={(event) => setDeepseekApiKey(event.target.value)} placeholder="sk-..." />
-                </div>
-                <div className="space-y-2">
-                  <Label>模型</Label>
-                  <Select value={deepseekModelId} onValueChange={setDeepseekModelId}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="deepseek-v4-flash">DeepSeek V4 Flash（推荐日常使用）</SelectItem>
-                      <SelectItem value="deepseek-v4-pro">DeepSeek V4 Pro（深度分析）</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <CardContent>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-7 text-slate-600">
+                  <p>AI_API_KEY：文本 AI API Key</p>
+                  <p>AI_API_BASE_URL：OpenAI 兼容接口地址，例如 https://yunwu.ai/v1</p>
+                  <p>AI_TEXT_MODEL：默认 gemini-3.1-flash-lite</p>
                 </div>
               </CardContent>
             </Card>
@@ -270,8 +252,8 @@ const SettingsPage = () => {
               <CardContent>
                 <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-7 text-slate-600">
                   <p>IMAGE_ANALYSIS_API_KEY：视觉分析 API Key</p>
-                  <p>IMAGE_ANALYSIS_API_BASE_URL：OpenAI 兼容接口地址，例如 https://api.example.com/v1</p>
-                  <p>IMAGE_ANALYSIS_MODEL：默认 gemini-3.1-flash-lite</p>
+                  <p>IMAGE_ANALYSIS_API_BASE_URL：可选；为空时使用 AI_API_BASE_URL</p>
+                  <p>IMAGE_ANALYSIS_MODEL：可选；为空时使用 AI_TEXT_MODEL</p>
                 </div>
               </CardContent>
             </Card>

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AIModelType, AI_MODEL_CONFIGS } from "@/config/ai";
+import { callServerChatCompletion } from "@/features/career/lib/server-ai";
 
 export const Route = createFileRoute("/api/grammar")({
   server: {
@@ -7,18 +7,9 @@ export const Route = createFileRoute("/api/grammar")({
       POST: async ({ request }) => {
         try {
           const body = await request.json();
-          const { apiKey, model, content, modelType, apiEndpoint } = body as {
-            apiKey: string;
-            model: string;
+          const { content } = body as {
             content: string;
-            modelType: AIModelType;
-            apiEndpoint?: string;
           };
-
-          const modelConfig = AI_MODEL_CONFIGS[modelType as AIModelType];
-          if (!modelConfig) {
-            throw new Error("Invalid model type");
-          }
 
           const systemPrompt = `你是一个专业的中文简历校对助手。你的任务是**仅**找出简历中的**错别字**和**标点符号错误**。
 
@@ -50,25 +41,18 @@ export const Route = createFileRoute("/api/grammar")({
 
             再次强调：**只找错别字和标点错误，不要做任何润色！**`;
 
-          const response = await fetch(modelConfig.url(apiEndpoint), {
-            method: "POST",
-            headers: modelConfig.headers(apiKey),
-            body: JSON.stringify({
-              model: modelConfig.requiresModelId ? model : modelConfig.defaultModel,
-              response_format: {
-                type: "json_object"
+          const response = await callServerChatCompletion({
+            responseFormat: { type: "json_object" },
+            messages: [
+              {
+                role: "system",
+                content: systemPrompt
               },
-              messages: [
-                {
-                  role: "system",
-                  content: systemPrompt
-                },
-                {
-                  role: "user",
-                  content
-                }
-              ]
-            })
+              {
+                role: "user",
+                content
+              }
+            ],
           });
 
           const data = await response.json();

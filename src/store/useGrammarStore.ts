@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { toast } from "sonner";
 import Mark from "mark.js";
 import { useAIConfigStore } from "@/store/useAIConfigStore";
-import { AI_MODEL_CONFIGS } from "@/config/ai";
 import { cn } from "@/lib/utils";
 
 export interface GrammarError {
@@ -90,14 +89,7 @@ export const useGrammarStore = create<GrammarStore>((set, get) => ({
     set((state) => ({ highlightKey: state.highlightKey + 1 })),
 
   checkGrammar: async (text: string) => {
-    const {
-      selectedModel,
-      deepseekApiKey,
-      deepseekModelId,
-      mockAIEnabled,
-    } = useAIConfigStore.getState();
-
-    const config = AI_MODEL_CONFIGS[selectedModel];
+    const { mockAIEnabled } = useAIConfigStore.getState();
 
     set({ isChecking: true });
 
@@ -131,9 +123,6 @@ export const useGrammarStore = create<GrammarStore>((set, get) => ({
         },
         body: JSON.stringify({
           content: text,
-          apiKey: deepseekApiKey,
-          model: config.requiresModelId ? deepseekModelId : config.defaultModel,
-          modelType: selectedModel,
         }),
       });
 

@@ -48,21 +48,21 @@ export const Route = createFileRoute("/api/openai/image-analysis")({
       POST: async ({ request }) => {
         try {
           const body = await request.json() as RequestBody;
-          const apiKey = readEnv("IMAGE_ANALYSIS_API_KEY") || readEnv("OPENAI_API_KEY");
+          const apiKey = readEnv("IMAGE_ANALYSIS_API_KEY") || readEnv("AI_API_KEY") || readEnv("OPENAI_API_KEY");
           const baseURL = normalizeBaseURL(
-            readEnv("IMAGE_ANALYSIS_API_BASE_URL") || readEnv("OPENAI_API_BASE_URL"),
+            readEnv("IMAGE_ANALYSIS_API_BASE_URL") || readEnv("AI_API_BASE_URL") || readEnv("OPENAI_API_BASE_URL"),
           );
-          const model = readEnv("IMAGE_ANALYSIS_MODEL") || DEFAULT_IMAGE_ANALYSIS_MODEL;
+          const model = readEnv("IMAGE_ANALYSIS_MODEL") || readEnv("AI_TEXT_MODEL") || DEFAULT_IMAGE_ANALYSIS_MODEL;
           const imageBase64 = body.imageBase64?.trim();
           const text = body.text?.trim();
           const systemPrompt = body.systemPrompt?.trim();
 
           if (!apiKey) {
-            return Response.json({ error: "缺少 IMAGE_ANALYSIS_API_KEY 环境变量" }, { status: 500 });
+            return Response.json({ error: "缺少 AI_API_KEY 或 IMAGE_ANALYSIS_API_KEY 环境变量" }, { status: 500 });
           }
 
           if (!baseURL) {
-            return Response.json({ error: "缺少 IMAGE_ANALYSIS_API_BASE_URL 环境变量" }, { status: 500 });
+            return Response.json({ error: "缺少 AI_API_BASE_URL 或 IMAGE_ANALYSIS_API_BASE_URL 环境变量" }, { status: 500 });
           }
 
           if (!imageBase64 || !imageBase64.startsWith("data:image/")) {

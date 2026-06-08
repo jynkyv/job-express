@@ -4,6 +4,10 @@ type RequestBody = {
   prompt?: string;
   size?: string;
   n?: number;
+  quality?: string;
+  format?: string;
+  background?: string;
+  moderation?: string;
 };
 
 function readEnv(name: string) {
@@ -37,7 +41,7 @@ export const Route = createFileRoute("/api/yunwu/image-generation")({
           const baseURL = normalizeBaseURL(
             readEnv("YUNWU_IMAGE_API_BASE_URL") || readEnv("YUNWU_API_BASE_URL"),
           );
-          const model = readEnv("YUNWU_IMAGE_MODEL");
+          const model = readEnv("YUNWU_IMAGE_MODEL") || "gpt-image-2";
           const prompt = body.prompt?.trim();
 
           if (!apiKey) {
@@ -46,10 +50,6 @@ export const Route = createFileRoute("/api/yunwu/image-generation")({
 
           if (!baseURL) {
             return Response.json({ error: "缺少 YUNWU_IMAGE_API_BASE_URL 环境变量" }, { status: 500 });
-          }
-
-          if (!model) {
-            return Response.json({ error: "缺少 YUNWU_IMAGE_MODEL 环境变量" }, { status: 500 });
           }
 
           if (!prompt) {
@@ -67,6 +67,10 @@ export const Route = createFileRoute("/api/yunwu/image-generation")({
               prompt,
               size: body.size || "1024x1024",
               n: body.n || 1,
+              quality: body.quality || "low",
+              format: body.format || "jpeg",
+              ...(body.background ? { background: body.background } : {}),
+              ...(body.moderation ? { moderation: body.moderation } : {}),
             }),
           });
 

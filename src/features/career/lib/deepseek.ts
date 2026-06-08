@@ -1,4 +1,4 @@
-import { getDeepSeekConfig, isMockAIEnabled } from "./config"
+import { isMockAIEnabled } from "./config"
 import { getMockDeepSeekResponse, streamMockText } from "./mock-ai"
 
 export interface DeepSeekMessage {
@@ -8,7 +8,7 @@ export interface DeepSeekMessage {
 
 export class DeepSeekNotConfiguredError extends Error {
   constructor() {
-    super("DeepSeek API 未配置，请在设置中填写 API 密钥")
+    super("AI API 未配置，请检查服务器环境变量")
     this.name = "DeepSeekNotConfiguredError"
   }
 }
@@ -21,30 +21,25 @@ export async function callDeepSeek(
     return streamMockText(getMockDeepSeekResponse(messages), onChunk)
   }
 
-  const { apiKey, baseURL, model } = getDeepSeekConfig()
-
-  if (!apiKey) {
-    throw new DeepSeekNotConfiguredError()
-  }
-
-  const response = await fetch(`${baseURL}/chat/completions`, {
+  const response = await fetch("/api/ai/chat", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model,
       messages,
       stream: !!onChunk,
       temperature: 0.3,
-      max_tokens: onChunk ? 3072 : 4096,
-      reasoning_effort: "low",
+      maxTokens: onChunk ? 3072 : 4096,
     }),
   })
 
   if (!response.ok) {
-    throw new Error(`API error: ${response.status} ${response.statusText}`)
+    const data = await response.json().catch(() => null)
+    if (response.status === 500 && data?.error?.includes("环境变量")) {
+      throw new DeepSeekNotConfiguredError()
+    }
+    throw new Error(data?.error || `API error: ${response.status} ${response.statusText}`)
   }
 
   if (onChunk && response.body) {

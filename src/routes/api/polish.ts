@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AIModelType, AI_MODEL_CONFIGS } from "@/config/ai";
+import { callServerChatCompletion } from "@/features/career/lib/server-ai";
 
 export const Route = createFileRoute("/api/polish")({
   server: {
@@ -7,19 +7,10 @@ export const Route = createFileRoute("/api/polish")({
       POST: async ({ request }) => {
         try {
           const body = await request.json();
-          const { apiKey, model, content, modelType, apiEndpoint, customInstructions } = body as {
-            apiKey: string;
-            model: string;
+          const { content, customInstructions } = body as {
             content: string;
-            modelType: AIModelType;
-            apiEndpoint?: string;
             customInstructions?: string;
           };
-
-          const modelConfig = AI_MODEL_CONFIGS[modelType as AIModelType];
-          if (!modelConfig) {
-            throw new Error("Invalid model type");
-          }
 
           let systemPrompt = `你是一个专业的简历优化助手。请帮助优化以下 Markdown 格式的文本，使其更加专业和有吸引力。
 
@@ -37,23 +28,18 @@ export const Route = createFileRoute("/api/polish")({
             systemPrompt += `\n\n用户额外要求：\n${customInstructions.trim()}`;
           }
 
-          const response = await fetch(modelConfig.url(apiEndpoint), {
-            method: "POST",
-            headers: modelConfig.headers(apiKey),
-            body: JSON.stringify({
-              model: modelConfig.requiresModelId ? model : modelConfig.defaultModel,
-              messages: [
-                {
-                  role: "system",
-                  content: systemPrompt
-                },
-                {
-                  role: "user",
-                  content
-                }
-              ],
-              stream: true
-            })
+          const response = await callServerChatCompletion({
+            stream: true,
+            messages: [
+              {
+                role: "system",
+                content: systemPrompt
+              },
+              {
+                role: "user",
+                content
+              }
+            ],
           });
 
           const encoder = new TextEncoder();
