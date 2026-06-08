@@ -4,7 +4,6 @@ import { useState, useMemo, useEffect, useCallback } from "react"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { POSITIONS } from "@/features/career/lib/prompts"
-import { isOpenAIConfigured } from "@/features/career/lib/config"
 import { usePhotoUpload } from "@/features/career/hooks/usePhotoUpload"
 import { usePhotoValidation } from "@/features/career/hooks/usePhotoValidation"
 import { useImageAnalysis } from "@/features/career/hooks/useImageAnalysis"
@@ -262,11 +261,6 @@ export default function ImageAnalysis({ onResultChange }: Props) {
     setError("")
     onResultChange(null)
     setActiveTab("outfit")
-
-    if (!isOpenAIConfigured()) {
-      setError("请先在设置中配置 OpenAI API 密钥")
-      return
-    }
 
     await analyze(bmi, age, gender, position, processedPhotos)
   }, [bmi, processedPhotos, age, gender, position, analyze, onResultChange])

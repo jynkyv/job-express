@@ -2,7 +2,6 @@
 
 import { useState, useCallback, useRef } from "react"
 import { callOpenAIWithImage, OpenAINotConfiguredError } from "@/features/career/lib/openai-image"
-import { getOpenAIConfig } from "@/features/career/lib/config"
 import { SYSTEM_PROMPTS, POSITIONS } from "@/features/career/lib/prompts"
 import type { BmiData, ImageAnalysisV2Result } from "@/features/career/types"
 
@@ -32,7 +31,7 @@ export interface ImageAnalysisState {
 const ANALYSIS_STEPS: Record<AnalysisPhase, { message: string; progress: number }> = {
   idle:           { message: "", progress: 0 },
   validating:     { message: "正在校验照片质量...", progress: 10 },
-  analyzing:      { message: "OpenAI 正在分析照片...", progress: 30 },
+  analyzing:      { message: "视觉模型正在分析照片...", progress: 30 },
   parsing:        { message: "正在整理分析结果...", progress: 80 },
   complete:       { message: "分析完成", progress: 100 },
   error:          { message: "分析失败", progress: 0 },
@@ -101,7 +100,6 @@ export function useImageAnalysis() {
       }
 
       try {
-        const { imageModel } = getOpenAIConfig()
         const fullText = await callOpenAIWithImage(
           photosUsed,
           analysisText,
@@ -114,7 +112,7 @@ export function useImageAnalysis() {
 
         setPhase("parsing")
         const parsed = extractJson(fullText) as ImageAnalysisV2Result
-        setResult({ ...parsed, analyzed_at: new Date().toISOString(), model_used: imageModel })
+        setResult({ ...parsed, analyzed_at: new Date().toISOString(), model_used: "gemini-3.1-flash-lite" })
         setPhase("complete")
         setError("")
         return

@@ -42,16 +42,12 @@ const SettingsPage = () => {
     deepseekModelId,
     qwenApiKey,
     qwenModelId,
-    openaiApiKey,
-    openaiImageModelId,
     speechProvider,
     mockAIEnabled,
     setDeepseekApiKey,
     setDeepseekModelId,
     setQwenApiKey,
     setQwenModelId,
-    setOpenAIApiKey,
-    setOpenAIImageModelId,
     setSpeechProvider,
     setMockAIEnabled,
   } = useAIConfigStore();
@@ -264,33 +260,18 @@ const SettingsPage = () => {
                     <ScanFace className="size-6" />
                   </div>
                   <div>
-                    <CardTitle>OpenAI 视觉分析</CardTitle>
+                    <CardTitle>视觉分析模型</CardTitle>
                     <CardDescription className="mt-2 leading-6">
-                      用于职业形象照片校验和形象报告生成。默认使用 gpt-4.1-mini，兼顾图片理解效果、速度和成本。
+                      用于职业形象照片校验和形象报告生成。密钥与模型由服务器环境变量控制，默认模型为 gemini-3.1-flash-lite。
                     </CardDescription>
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label htmlFor="openai-key">OpenAI API 密钥</Label>
-                    <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer" className="flex items-center gap-1 text-xs text-blue-700 hover:underline">
-                      获取密钥 <ExternalLink className="size-3" />
-                    </a>
-                  </div>
-                  <Input id="openai-key" type="password" value={openaiApiKey} onChange={(event) => setOpenAIApiKey(event.target.value)} placeholder="sk-..." />
-                </div>
-                <div className="space-y-2">
-                  <Label>图像分析模型</Label>
-                  <Select value={openaiImageModelId} onValueChange={setOpenAIImageModelId}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="gpt-4.1-mini">gpt-4.1-mini（推荐日常使用）</SelectItem>
-                      <SelectItem value="gpt-4.1">gpt-4.1（更强图片理解）</SelectItem>
-                      <SelectItem value="gpt-5.1">gpt-5.1（深度分析）</SelectItem>
-                    </SelectContent>
-                  </Select>
+              <CardContent>
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold leading-7 text-slate-600">
+                  <p>IMAGE_ANALYSIS_API_KEY：视觉分析 API Key</p>
+                  <p>IMAGE_ANALYSIS_API_BASE_URL：OpenAI 兼容接口地址，例如 https://api.example.com/v1</p>
+                  <p>IMAGE_ANALYSIS_MODEL：默认 gemini-3.1-flash-lite</p>
                 </div>
               </CardContent>
             </Card>

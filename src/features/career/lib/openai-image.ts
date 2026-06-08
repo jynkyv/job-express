@@ -1,13 +1,13 @@
 "use client"
 
-import { getOpenAIConfig, isMockAIEnabled } from "./config"
+import { isMockAIEnabled } from "./config"
 import { getMockImageAnalysisResponse, getMockPhotoValidationResponse, streamMockText } from "./mock-ai"
 
 export type OpenAIImageMode = "validation" | "analysis"
 
 export class OpenAINotConfiguredError extends Error {
   constructor() {
-    super("OpenAI API 未配置，请在设置中填写 API 密钥")
+    super("视觉分析 API 未配置，请检查服务器环境变量")
     this.name = "OpenAINotConfiguredError"
   }
 }
@@ -36,18 +36,10 @@ export async function callOpenAIWithImage(
     )
   }
 
-  const { apiKey, imageModel } = getOpenAIConfig()
-
-  if (!apiKey) {
-    throw new OpenAINotConfiguredError()
-  }
-
   const response = await fetch("/api/openai/image-analysis", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      apiKey,
-      model: imageModel,
       imageBase64,
       text,
       systemPrompt,
@@ -60,12 +52,12 @@ export async function callOpenAIWithImage(
   if (!response.ok) {
     throw new OpenAIImageApiError(
       response.status,
-      data?.error || "OpenAI 图像分析请求失败，请稍后重试",
+      data?.error || "视觉分析请求失败，请稍后重试",
     )
   }
 
   if (typeof data?.content !== "string" || !data.content.trim()) {
-    throw new OpenAIImageApiError(response.status, "OpenAI 返回内容为空，请重试")
+    throw new OpenAIImageApiError(response.status, "视觉分析返回内容为空，请重试")
   }
 
   return data.content
