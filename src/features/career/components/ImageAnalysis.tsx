@@ -7,6 +7,7 @@ import { POSITIONS } from "@/features/career/lib/prompts"
 import { usePhotoUpload } from "@/features/career/hooks/usePhotoUpload"
 import { usePhotoValidation } from "@/features/career/hooks/usePhotoValidation"
 import { useImageAnalysis } from "@/features/career/hooks/useImageAnalysis"
+import { getMockImageAnalysisResponse } from "@/features/career/lib/mock-ai"
 import ImageResult from "./ImageResult"
 import type { BmiData, ImageAnalysisV2Result } from "@/features/career/types"
 import type { SharedImageResult } from "@/features/career/context/AppContext"
@@ -142,6 +143,11 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   const [error, setError] = useState("")
   const [view, setView] = useState<"input" | "result">("input")
   const [showPrivacy, setShowPrivacy] = useState(false)
+  const demoResult = useMemo(() => {
+    if (typeof window === "undefined") return null
+    if (new URLSearchParams(window.location.search).get("demoResult") !== "1") return null
+    return normalizeImageAnalysisResult(JSON.parse(getMockImageAnalysisResponse()) as ImageAnalysisV2Result)
+  }, [])
 
   const {
     photos, processedPhotos, isDragging, fileInputRef, dropRef,
@@ -151,8 +157,8 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   const { validation, isValidating: isValidatingPhoto, validatePhoto, clearValidation } = usePhotoValidation()
   const { phase, result: analysisResult, error: analysisError, retryCount, analyze, reset: resetAnalysis } = useImageAnalysis()
   const safeAnalysisResult = useMemo(
-    () => analysisResult ? normalizeImageAnalysisResult(analysisResult) : null,
-    [analysisResult]
+    () => demoResult || (analysisResult ? normalizeImageAnalysisResult(analysisResult) : null),
+    [analysisResult, demoResult]
   )
 
   const bmi = useMemo(() => {
@@ -168,8 +174,15 @@ export default function ImageAnalysis({ onResultChange }: Props) {
   const canAnalyze = !isLoading
 
   useEffect(() => {
+    if (demoResult) {
+      const params = new URLSearchParams(window.location.search)
+      setGender(params.get("demoGender") || "male")
+      setPosition(params.get("demoPosition") || "jwu")
+      setView("result")
+      return
+    }
     if (analysisError) setError(analysisError)
-  }, [analysisError])
+  }, [analysisError, demoResult])
 
   // 分析完成 → 共享结果给其他页面，并切到结果页
   useEffect(() => {
@@ -240,6 +253,7 @@ export default function ImageAnalysis({ onResultChange }: Props) {
         result={safeAnalysisResult}
         photo={photos[0]}
         bmi={bmi}
+        gender={gender}
         position={position}
         positionLabel={positionLabel}
         onBack={() => setView("input")}

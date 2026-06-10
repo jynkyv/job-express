@@ -8,11 +8,13 @@ interface Props {
   photo?: string
   analysis: ImageAnalysisV2Result
   position: string
+  gender: string
 }
 
-export default function HeadshotCard({ photo, analysis, position }: Props) {
+export default function HeadshotCard({ photo, analysis, position, gender }: Props) {
   const { phase, image, error, generate, reset } = useHeadshot()
   const isGenerating = phase === "generating"
+  const exampleSrc = gender === "female" ? "/image-guides/headshot-example-female.png" : "/image-guides/headshot-example-male.png"
 
   const handleGenerate = () => {
     if (!photo) return
@@ -28,7 +30,7 @@ export default function HeadshotCard({ photo, analysis, position }: Props) {
   }
 
   return (
-    <div className="flex h-full flex-col rounded-[28px] border border-blue-100 bg-gradient-to-b from-blue-50/70 to-white p-6 shadow-sm">
+    <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start gap-3">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
           <Camera className="size-5" />
@@ -51,6 +53,26 @@ export default function HeadshotCard({ photo, analysis, position }: Props) {
           loading={isGenerating}
           placeholder="生成后显示"
         />
+      </div>
+
+      <div className="mt-4 rounded-2xl border border-blue-100 bg-blue-50/60 p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <p className="text-xs font-black text-blue-800">生成效果示例</p>
+          <span className="rounded-full bg-white px-2 py-1 text-[10px] font-black text-blue-600 shadow-sm">仅作样式参考</span>
+        </div>
+        <div className="grid grid-cols-[96px_minmax(0,1fr)] items-center gap-3">
+          <div className="overflow-hidden rounded-xl border border-white bg-white shadow-sm">
+            <div className="aspect-[3/4] bg-slate-50">
+              <img src={exampleSrc} alt="形象照生成效果示例" className="h-full w-full object-contain" />
+            </div>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-black text-slate-900">标准二寸白底西装证件照</p>
+            <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">
+              生成时会以本人照片替换面部身份，保留自然五官、正式表情、正面构图和白底柔光效果。
+            </p>
+          </div>
+        </div>
       </div>
 
       {phase === "error" && (
@@ -86,11 +108,13 @@ export default function HeadshotCard({ photo, analysis, position }: Props) {
             className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-black text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60"
           >
             {isGenerating ? <Loader2 className="size-4 animate-spin" /> : <Wand2 className="size-4" />}
-            {isGenerating ? "正在生成形象照…" : "生成形象照"}
+            {isGenerating ? "正在生成形象照…" : photo ? "生成形象照" : "需要上传本人照片"}
           </button>
         )}
         <p className="text-[11px] font-semibold leading-4 text-slate-400">
-          照片会发送到已配置的图像服务用于本次生成，结果不写入简历，仅在当前页面展示。生成效果受模型能力影响，仅供参考。
+          {photo
+            ? "照片会发送到已配置的图像服务用于本次生成，结果不写入简历，仅在当前页面展示。生成效果受模型能力影响，仅供参考。"
+            : "演示结果页没有真实上传照片，所以暂时不能生成形象照。上传本人照片完成分析后，这里会开放生成。"}
         </p>
       </div>
     </div>
@@ -118,7 +142,7 @@ function Frame({
             <span className="text-[11px] font-bold">生成中…</span>
           </div>
         ) : src ? (
-          <img src={src} alt={label} className="h-full w-full object-cover" />
+          <img src={src} alt={label} className="h-full w-full object-contain" />
         ) : (
           <div className="flex h-full w-full items-center justify-center px-2 text-center text-[11px] font-bold text-slate-400">
             {placeholder || "暂无图片"}

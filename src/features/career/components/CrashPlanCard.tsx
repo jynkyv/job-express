@@ -37,9 +37,9 @@ export default function CrashPlanCard({ analysis, position }: Props) {
   const handleGenerate = () => generate(analysis, effectiveDays, position)
 
   return (
-    <div className="flex h-full flex-col rounded-[28px] border border-amber-100 bg-gradient-to-b from-amber-50/70 to-white p-6 shadow-sm">
+    <div className="flex h-full flex-col rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
       <div className="flex items-start gap-3">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-white shadow-sm">
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-sm">
           <Zap className="size-5" />
         </span>
         <div>
@@ -62,8 +62,8 @@ export default function CrashPlanCard({ analysis, position }: Props) {
                 onClick={() => { setDays(preset.days); setCustom("") }}
                 className={`rounded-full px-4 py-2 text-sm font-black transition ${
                   active
-                    ? "bg-amber-500 text-white shadow-sm"
-                    : "bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-amber-200"
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-white text-slate-500 ring-1 ring-slate-200 hover:ring-blue-200"
                 }`}
               >
                 {preset.label}
@@ -71,7 +71,7 @@ export default function CrashPlanCard({ analysis, position }: Props) {
             )
           })}
           <div className={`flex items-center gap-1 rounded-full px-3 py-1.5 ring-1 transition ${
-            custom.trim() ? "bg-amber-500 text-white ring-amber-500" : "bg-white text-slate-500 ring-slate-200"
+            custom.trim() ? "bg-blue-600 text-white ring-blue-600" : "bg-white text-slate-500 ring-slate-200"
           }`}>
             <input
               type="text"
@@ -89,7 +89,7 @@ export default function CrashPlanCard({ analysis, position }: Props) {
       <button
         onClick={handleGenerate}
         disabled={isGenerating}
-        className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 text-sm font-black text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60"
+        className="mt-4 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 text-sm font-black text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-60"
       >
         {isGenerating ? <Loader2 className="size-4 animate-spin" /> : <Zap className="size-4" />}
         {isGenerating ? "正在排冲刺计划…" : result ? "重新生成冲刺计划" : "生成急训计划"}
@@ -118,12 +118,12 @@ export default function CrashPlanCard({ analysis, position }: Props) {
               <div key={i} className="rounded-2xl border border-slate-200 bg-white p-4">
                 <div className="mb-2.5 flex items-center justify-between">
                   <p className="text-sm font-black text-slate-900">{stage.title}</p>
-                  <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-black text-amber-600">{stage.window}</span>
+                  <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-black text-blue-600">{stage.window}</span>
                 </div>
                 <div className="space-y-2">
                   {stage.items.map((item, j) => (
                     <div key={j} className="flex items-start gap-2.5">
-                      <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
+                      <ChevronRight className="mt-0.5 size-3.5 shrink-0 text-blue-500" />
                       <p className="flex-1 text-xs font-semibold leading-5 text-slate-600">{item.text}</p>
                       <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black ${CATEGORY_STYLE[item.category] || CATEGORY_STYLE["其他"]}`}>
                         {item.category}
@@ -151,7 +151,7 @@ export default function CrashPlanCard({ analysis, position }: Props) {
 
           <button
             onClick={reset}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 transition hover:text-amber-600"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-400 transition hover:text-blue-600"
           >
             <RefreshCw className="size-3.5" />
             重新选择天数

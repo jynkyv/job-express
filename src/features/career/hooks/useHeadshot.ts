@@ -10,13 +10,16 @@ export type HeadshotPhaseState = "idle" | "generating" | "done" | "error"
 /** 根据形象分析结果与岗位，拼出形象照图生图 prompt。 */
 export function buildHeadshotPrompt(analysis: ImageAnalysisV2Result, position: string): string {
   const posLabel = POSITIONS.find((p) => p.value === position)?.label || "求职面试"
+  const clothing =
+    analysis.outfit_analysis.clothing_type || "深色西装、白色衬衫，男士可搭配深蓝或深灰领带，女士使用白衬衫无领带"
+
   return [
-    `把这张照片处理成一张专业的${posLabel}面试形象照。`,
-    "严格保留人物本人的五官特征、脸型、肤色、发际线、年龄和性别，不要改变长相，只优化形象呈现。",
-    `着装换成得体合身的面试正装：${analysis.outfit_analysis.clothing_type || "深色西装或商务衬衫"}，领口平整、肩线合适。`,
-    "整理发型与仪容，使其干净利落、清爽专业。",
-    "背景替换为纯净的浅灰或浅蓝职业背景，柔和均匀的专业打光，正面端正构图，神态自信而亲和。",
-    "成片风格类似高质量职业证件照/LinkedIn 头像。",
+    `将用户上传照片处理成一张适合「${posLabel}」使用的中国标准二寸白底西装证件照。`,
+    "严格保留用户本人真实身份特征：脸型、眉毛、眼睛、鼻子、嘴唇、耳朵、发际线、自然肤色、年龄感和五官比例都要可辨认为同一个人。",
+    `服装替换为得体正式的面试正装：${clothing}。保持领口平整、肩部水平、双肩自然对称、人物居中。`,
+    "画面要求：正面面对镜头，头部端正，眼睛平视镜头，嘴唇自然闭合，表情正式自然，不露齿，纯白背景，真实照相馆柔光，肤色自然，保留适量真实皮肤纹理，只做轻微证件照级别修饰。",
+    "不要改变脸型，不要改变年龄，不要过度磨皮，不要美化成陌生人，不要生成网红脸，不要改变五官比例，不要添加夸张妆容，不要生成文字、边框、水印或 logo。",
+    "最终效果应真实、自然、清晰，像标准白底西装证件照，而不是 AI 写真、商务海报或艺术照。",
   ].join("")
 }
 
